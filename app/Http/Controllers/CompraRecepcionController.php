@@ -31,7 +31,7 @@ class CompraRecepcionController extends Controller
                 $q->where('r.estado', $request->estado))
             ->orderByDesc('r.id');
 
-        return Inertia::render('Compras/Recepciones', [
+        return Inertia::render($request->is('compras/recepciones') ? 'Compras/RecepcionesListado' : 'Compras/Recepciones', [
             'recepciones' => $query->paginate(10)->withQueryString(),
             'proveedores' => DB::table('proveedores')->where('estado', true)
                 ->orderBy('nombre')->get(['id', 'nombre']),
