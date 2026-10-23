@@ -9,6 +9,7 @@ use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CompraRecepcionController;
+use App\Http\Controllers\PagoProveedorController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -93,6 +94,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/compras/proveedores/{proveedor}/estado', [ProveedorController::class, 'cambiarEstado'])
         ->name('proveedores.estado');
 
+
+    // PAGOS A PROVEEDORES
+    Route::get('/compras/pagos', [PagoProveedorController::class, 'index'])->name('compras.pagos.index');
+    Route::post('/compras/pagos', [PagoProveedorController::class, 'store'])->name('compras.pagos.store');
 
     // LISTADO DE ÓRDENES Y RECEPCIÓN DE COMPRAS
     Route::get('/compras/ordenes', [CompraRecepcionController::class, 'index'])->name('compras.ordenes.index');
