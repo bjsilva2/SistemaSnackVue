@@ -31,6 +31,10 @@ class CompraRecepcionController extends Controller
                 $q->where('r.estado', $request->estado))
             ->orderByDesc('r.id');
 
+        // Vista previa; el número definitivo se asigna al guardar mediante la secuencia de PostgreSQL.
+        $siguienteId = (int) DB::table('compra_recepciones')->max('id') + 1;
+        $siguienteFactura = 'FAC-' . str_pad((string) $siguienteId, 4, '0', STR_PAD_LEFT);
+
         return Inertia::render($request->is('compras/recepciones') ? 'Compras/RecepcionesListado' : 'Compras/Recepciones', [
             'recepciones' => $query->paginate(10)->withQueryString(),
             'proveedores' => DB::table('proveedores')->where('estado', true)
@@ -38,6 +42,7 @@ class CompraRecepcionController extends Controller
             'productos' => Producto::where('estado', true)->where('tipo', 'PRODUCTO')
                 ->orderBy('nombre')->get(['id', 'nombre', 'codigo', 'stock_actual', 'precio_compra', 'precio_venta']),
             'filtros' => $filtros,
+            'siguienteFactura' => $siguienteFactura,
         ]);
     }
 
