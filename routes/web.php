@@ -8,6 +8,7 @@ use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\CompraRecepcionController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -93,6 +94,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('proveedores.estado');
 
 
+    // RECEPCIÓN DE COMPRAS
+    Route::get('/compras/recepciones', [CompraRecepcionController::class, 'index'])->name('compras.recepciones.index');
+    Route::post('/compras/recepciones', [CompraRecepcionController::class, 'store'])->name('compras.recepciones.store');
 
 });
 
