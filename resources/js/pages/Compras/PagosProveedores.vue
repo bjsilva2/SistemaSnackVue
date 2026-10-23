@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Search, X, Save, MoreVertical } from 'lucide-vue-next';
-type Compra={id:number;codigo:string;recibo_factura:string|null;fecha:string;sucursal:string;tipo_pago:string;metodo_pago:string;total:string|number;a_cuenta:string|number;saldo:string|number;estado:string;proveedor:string};
+type Compra={id:number;codigo:string;recibo_factura:string|null;fecha:string;sucursal:string;tipo_pago:string;metodo_pago:string;total:string|number;a_cuenta:string|number;saldo:string|number;estado:string;proveedor:string;efectivo_total:number|string;transferencia_total:number|string;fecha_pago:string};
 type Pagina={data:Compra[];current_page:number;last_page:number;total:number};
 const props=defineProps<{compras:Pagina;proveedores:{id:number;nombre:string}[];sucursales:string[];filtros:Record<string,string|number|null>}>();
 const f=ref({sucursal:String(props.filtros.sucursal??''),nro_orden:String(props.filtros.nro_orden??''),nro_factura:String(props.filtros.nro_factura??''),proveedor_id:String(props.filtros.proveedor_id??''),tipo_pago:String(props.filtros.tipo_pago??''),estado_pago:String(props.filtros.estado_pago??''),fecha_inicio:String(props.filtros.fecha_inicio??''),fecha_fin:String(props.filtros.fecha_fin??''),buscar:String(props.filtros.buscar??'')});
@@ -37,10 +37,10 @@ function guardar(){form.post('/compras/pagos',{preserveScroll:true,onSuccess:()=
 <thead><tr><th>OC_ID</th><th>FACTURA ⇅</th><th>PROVEEDOR</th><th>FECHA PAGO ⇅</th><th>T.COMPRAS</th><th>EFECTIVO</th><th>TRANSFERENCIA</th><th>SALDO</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
 <tbody>
 <tr v-for="c in compras.data" :key="c.id">
-<td>{{c.id}}</td><td>{{c.recibo_factura||'No Registrado'}}</td><td>{{c.proveedor}}</td><td>{{c.fecha}}</td>
+<td>{{c.id}}</td><td>{{c.recibo_factura||'No Registrado'}}</td><td>{{c.proveedor}}</td><td>{{c.fecha_pago}}</td>
 <td class="num">{{dinero(c.total)}}</td>
-<td class="num">{{dinero(c.metodo_pago==='EFECTIVO'?c.a_cuenta:0)}}</td>
-<td class="num">{{dinero(c.metodo_pago==='EFECTIVO'?0:c.a_cuenta)}}</td>
+<td class="num">{{dinero(c.efectivo_total)}}</td>
+<td class="num">{{dinero(c.transferencia_total)}}</td>
 <td class="num">{{dinero(c.saldo)}}</td>
 <td><span class="estado" :class="{pendiente:Number(c.saldo)>0}">{{Number(c.saldo)>0?'PENDIENTE':'PAGADO'}}</span></td>
 <td><button type="button" class="acciones" :disabled="Number(c.saldo)<=0" :title="Number(c.saldo)>0?'Registrar pago':'Compra pagada'" @click="abrir(c)"><MoreVertical :size="15"/></button></td>
