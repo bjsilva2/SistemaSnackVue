@@ -94,7 +94,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('proveedores.estado');
 
 
-    // RECEPCIÓN DE COMPRAS
+    // LISTADO DE ÓRDENES Y RECEPCIÓN DE COMPRAS
+    Route::get('/compras/ordenes', [CompraRecepcionController::class, 'index'])->name('compras.ordenes.index');
     Route::get('/compras/recepciones', [CompraRecepcionController::class, 'index'])->name('compras.recepciones.index');
     Route::post('/compras/recepciones', [CompraRecepcionController::class, 'store'])->name('compras.recepciones.store');
 
