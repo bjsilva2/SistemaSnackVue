@@ -8,7 +8,7 @@ type Proveedor = { id: number; nombre: string };
 type Producto = { id: number; nombre: string; codigo: string; stock_actual: number | string; precio_compra: number | string; precio_venta: number | string };
 type Recepcion = { id: number; codigo: string; recibo_factura: string | null; fecha: string; total: number | string; estado: string; proveedor: string; solicitado_por: string | null; sucursal: string };
 type Pagina = { data: Recepcion[]; total: number; current_page: number; last_page: number };
-const props = defineProps<{ recepciones: Pagina; proveedores: Proveedor[]; productos: Producto[]; filtros: Record<string, string | number | null> }>();
+const props = defineProps<{ recepciones: Pagina; proveedores: Proveedor[]; productos: Producto[]; filtros: Record<string, string | number | null>; siguienteFactura: string }>();
 const modal = ref(false);
 const buscadorProducto = ref('');
 const filtros = ref({
@@ -107,7 +107,7 @@ function guardar() {
                             </div>
                             <div class="busqueda-producto">
                                 <div class="campo-busqueda"><label>BUSCAR PRODUCTO | CÓD. ORIGEN | DESCRIPCIÓN:</label><input v-model="buscadorProducto" placeholder="Buscar producto por código o nombre..."/><div v-if="productosFiltrados.length" class="resultados"><button v-for="p in productosFiltrados" :key="p.id" type="button" @click="agregarProducto(p)">{{ p.codigo }} — {{ p.nombre }}</button></div></div>
-                                <div><label>RECIBO/FACTURA:</label><input value="Automático al guardar" readonly title="Número interno generado por el sistema"/></div>
+                                <div><label>RECIBO/FACTURA:</label><input :value="props.siguienteFactura" readonly title="Número interno estimado; se confirma al guardar"/></div>
                                 <div><label>DESCUENTO:</label><input v-model.number="form.descuento" type="number" min="0" step="0.01"/></div>
                             </div>
                             <div class="tabla detalle"><table>
