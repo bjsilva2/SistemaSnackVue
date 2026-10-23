@@ -54,7 +54,6 @@ const secciones = [
         items: [
             { titulo: 'Proveedores', ruta: '/compras/proveedores', icono: Truck },
             { titulo: 'Órdenes de Compra', ruta: '/compras/ordenes', icono: ClipboardList },
-            { titulo: 'Recepción de Compras', ruta: '/compras/recepciones', icono: Package },
             { titulo: 'Pago a Proveedores', ruta: '/compras/pagos', icono: CreditCard },
         ],
     },
