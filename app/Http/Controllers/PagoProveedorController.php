@@ -13,10 +13,20 @@ class PagoProveedorController extends Controller
     public function index(Request $request)
     {
         $filtros = $request->only(['sucursal','nro_orden','nro_factura','proveedor_id','tipo_pago','estado_pago','fecha_inicio','fecha_fin','buscar']);
+        $abonos = DB::table('pagos_proveedores')
+            ->select('recepcion_id')
+            ->selectRaw("COALESCE(SUM(CASE WHEN metodo_pago = 'EFECTIVO' THEN monto ELSE 0 END), 0) AS abono_efectivo")
+            ->selectRaw("COALESCE(SUM(CASE WHEN metodo_pago <> 'EFECTIVO' THEN monto ELSE 0 END), 0) AS abono_transferencia")
+            ->selectRaw("MAX(fecha_pago) AS ultima_fecha_pago")
+            ->groupBy('recepcion_id');
         $query = DB::table('compra_recepciones as c')
+            ->leftJoinSub($abonos, 'a', fn ($join) => $join->on('a.recepcion_id', '=', 'c.id'))
             ->join('proveedores as p', 'p.id', '=', 'c.proveedor_id')
             ->select('c.id','c.codigo','c.recibo_factura','c.fecha','c.sucursal','c.tipo_pago',
                 'c.metodo_pago','c.total','c.a_cuenta','c.saldo','c.estado','p.nombre as proveedor')
+            ->selectRaw("CASE WHEN c.metodo_pago = 'EFECTIVO' THEN (c.a_cuenta - (c.total - c.saldo - COALESCE(a.abono_efectivo, 0) - COALESCE(a.abono_transferencia, 0))) ELSE 0 END + COALESCE(a.abono_efectivo, 0) AS efectivo_total")
+            ->selectRaw("CASE WHEN c.metodo_pago <> 'EFECTIVO' THEN (c.a_cuenta - (c.total - c.saldo - COALESCE(a.abono_efectivo, 0) - COALESCE(a.abono_transferencia, 0))) ELSE 0 END + COALESCE(a.abono_transferencia, 0) AS transferencia_total")
+            ->selectRaw("COALESCE(a.ultima_fecha_pago, c.created_at) AS fecha_pago")
             ->when($request->filled('sucursal'), fn ($q) => $q->where('c.sucursal', $request->sucursal))
             ->when($request->filled('nro_orden'), fn ($q) => $q->where('c.codigo','ilike','%'.$request->nro_orden.'%'))
             ->when($request->filled('nro_factura'), fn ($q) => $q->where('c.recibo_factura','ilike','%'.$request->nro_factura.'%'))
