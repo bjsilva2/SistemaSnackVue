@@ -115,7 +115,7 @@ class CompraRecepcionController extends Controller
                 'proveedor_id' => $datos['proveedor_id'],
                 'fecha' => $datos['fecha'],
                 'sucursal' => $datos['sucursal'],
-                'recibo_factura' => 'FAC-AUTO-'.str_pad((string) $id, 6, '0', STR_PAD_LEFT),
+                'recibo_factura' => 'FAC-'.str_pad((string) $id, 4, '0', STR_PAD_LEFT),
                 'subtotal' => $dinero($subtotalCentavos),
                 'descuento' => $dinero($descuentoGeneral),
                 'total' => $dinero($totalCentavos),
