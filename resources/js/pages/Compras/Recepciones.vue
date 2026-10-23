@@ -24,7 +24,6 @@ const form = useForm({
     proveedor_id: null as number | null,
     sucursal: 'Sistema Snack',
     fecha: fechaLocal(),
-    recibo_factura: '',
     descuento: 0,
     tipo_pago: 'CONTADO' as 'CONTADO' | 'CREDITO',
     dias_credito: 0,
@@ -108,7 +107,7 @@ function guardar() {
                             </div>
                             <div class="busqueda-producto">
                                 <div class="campo-busqueda"><label>BUSCAR PRODUCTO | CÓD. ORIGEN | DESCRIPCIÓN:</label><input v-model="buscadorProducto" placeholder="Buscar producto por código o nombre..."/><div v-if="productosFiltrados.length" class="resultados"><button v-for="p in productosFiltrados" :key="p.id" type="button" @click="agregarProducto(p)">{{ p.codigo }} — {{ p.nombre }}</button></div></div>
-                                <div><label>RECIBO/FACTURA:</label><input v-model="form.recibo_factura" maxlength="80" placeholder="N° RECIBO"/></div>
+                                <div><label>RECIBO/FACTURA:</label><input value="Automático al guardar" readonly title="Número interno generado por el sistema"/></div>
                                 <div><label>DESCUENTO:</label><input v-model.number="form.descuento" type="number" min="0" step="0.01"/></div>
                             </div>
                             <div class="tabla detalle"><table>
