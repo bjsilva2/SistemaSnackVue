@@ -11,7 +11,7 @@ const modal=ref(false);
 const editando=ref<number|null>(null);
 const codigo=ref('Se genera automáticamente');
 const menu=ref<number|null>(null);
-const form=useForm({nombre_completo:'',ci_nit:'',telefono:'',domicilio:'',tipo_cliente:'Normal',estado:true});
+const form=useForm({nombre_completo:'',ci_nit:'',telefono:'',domicilio:'',tipo_cliente:'Normal',estado:true as boolean});
 function nuevo(){editando.value=null;codigo.value='Se genera automáticamente';form.reset();form.clearErrors();modal.value=true;menu.value=null}
 function editar(c:Cliente){editando.value=c.id;codigo.value=c.codigo;form.nombre_completo=c.nombre_completo;form.ci_nit=c.ci_nit||'';form.telefono=c.telefono||'';form.domicilio=c.domicilio||'';form.tipo_cliente=c.tipo_cliente;form.estado=c.estado;form.clearErrors();modal.value=true;menu.value=null}
 function guardar(){const opt={preserveScroll:true,onSuccess:()=>{modal.value=false;form.reset()}};if(editando.value)form.put('/ventas/clientes/'+editando.value,opt);else form.post('/ventas/clientes',opt)}
