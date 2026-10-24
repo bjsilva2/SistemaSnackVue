@@ -5,13 +5,13 @@ import { ref } from 'vue';
 import { Plus, Search, MoreVertical, X, Save } from 'lucide-vue-next';
 type Cliente={id:number;codigo:string;nombre_completo:string;ci_nit:string|null;telefono:string|null;domicilio:string|null;tipo_cliente:string;estado:boolean};
 type Pagina={data:Cliente[];total:number;current_page:number;last_page:number};
-const props=defineProps<{clientes:Pagina;filtros:{buscar:string}}>();
+const props=defineProps<{clientes:Pagina;filtros:{buscar:string};siguienteCodigo:string}>();
 const buscar=ref(props.filtros.buscar||'');
 const modal=ref(false);
 const editando=ref<number|null>(null);
-const codigo=ref('Se genera automáticamente');
+const codigo=ref(props.siguienteCodigo);
 const form=useForm({nombre_completo:'',ci_nit:'',telefono:'',domicilio:'',tipo_cliente:'Normal',estado:true as boolean});
-function nuevo(){editando.value=null;codigo.value='Se genera automáticamente';form.reset();form.clearErrors();modal.value=true}
+function nuevo(){editando.value=null;codigo.value=props.siguienteCodigo;form.reset();form.clearErrors();modal.value=true}
 function editar(c:Cliente){editando.value=c.id;codigo.value=c.codigo;form.nombre_completo=c.nombre_completo;form.ci_nit=c.ci_nit||'';form.telefono=c.telefono||'';form.domicilio=c.domicilio||'';form.tipo_cliente=c.tipo_cliente;form.estado=c.estado;form.clearErrors();modal.value=true}
 function guardar(){const opt={preserveScroll:true,onSuccess:()=>{modal.value=false;form.reset()}};if(editando.value)form.put('/ventas/clientes/'+editando.value,opt);else form.post('/ventas/clientes',opt)}
 function filtrar(){router.get('/ventas/clientes',{buscar:buscar.value},{preserveState:true,replace:true})}
