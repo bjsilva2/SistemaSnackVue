@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CompraRecepcionController;
 use App\Http\Controllers\PagoProveedorController;
+use App\Http\Controllers\ClienteController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -80,6 +81,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/catalogos/productos/{producto}/estado', [
         ProductoController::class, 'cambiarEstado'
     ])->name('productos.estado');
+
+    // CLIENTES
+    Route::get('/ventas/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+    Route::post('/ventas/clientes', [ClienteController::class, 'store'])->name('clientes.store');
+    Route::put('/ventas/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
+    Route::patch('/ventas/clientes/{cliente}/estado', [ClienteController::class, 'cambiarEstado'])->name('clientes.estado');
 
     // PROVEEDORES
     Route::get('/compras/proveedores', [ProveedorController::class, 'index'])

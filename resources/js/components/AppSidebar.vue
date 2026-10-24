@@ -65,7 +65,7 @@ const secciones = [
             { titulo: 'Punto de Venta', ruta: '/ventas/pos', icono: ShoppingCart },
             { titulo: 'Plano de Mesas', ruta: '/ventas/mesas', icono: UtensilsCrossed },
             { titulo: 'Pedidos de Cocina', ruta: '/ventas/cocina', icono: ChefHat },
-            { titulo: 'Clientes', ruta: '/ventas/clientes', icono: Users },
+            { titulo: 'Listado de Clientes', ruta: '/ventas/clientes', icono: Users },
         ],
     },
     {
