@@ -42,9 +42,13 @@ class ClienteController extends Controller
     {
         $datos = $this->validar($request);
         DB::transaction(function () use ($datos) {
-            $cliente = Cliente::create(array_merge($datos, ['codigo' => 'PENDIENTE-'.uniqid()]));
-            $cliente->codigo = 'CLI-' . str_pad((string) $cliente->id, 4, '0', STR_PAD_LEFT);
-            $cliente->save();
+            $id = (int) DB::selectOne(
+                "SELECT nextval(pg_get_serial_sequence('clientes', 'id')) AS numero"
+            )->numero;
+            Cliente::create(array_merge($datos, [
+                'id' => $id,
+                'codigo' => 'CLI-' . str_pad((string) $id, 4, '0', STR_PAD_LEFT),
+            ]));
         });
         return back()->with('success', 'Cliente registrado correctamente.');
     }
