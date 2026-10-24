@@ -20,8 +20,12 @@ class ClienteController extends Controller
                   ->orWhere('telefono', 'ilike', "%{$buscar}%");
             }))
             ->orderByDesc('id')->paginate(10)->withQueryString();
+        // Vista previa del siguiente código; el valor definitivo se asigna al guardar.
+        $siguienteId = (int) Cliente::max('id') + 1;
+        $siguienteCodigo = 'CLI-' . str_pad((string) $siguienteId, 4, '0', STR_PAD_LEFT);
         return Inertia::render('Ventas/Clientes', [
             'clientes' => $clientes,
+            'siguienteCodigo' => $siguienteCodigo,
             'filtros' => ['buscar' => $buscar],
         ]);
     }
