@@ -27,6 +27,7 @@ function crear(modalidad:'MESA'|'LLEVAR'|'YANGO',mesa:Mesa|null=null){
  form.reset();form.clearErrors();tipo.value=modalidad;mesaElegida.value=mesa;form.modalidad=modalidad;form.mesa_id=mesa?.id??null;vista.value='pedido';
 }
 function agregar(p:Producto){const i=form.items.find(i=>i.producto_id===p.id);if(i)i.cantidad++;else form.items.push({producto_id:p.id,cantidad:1});}
+function actualizarCantidad(id:number,event:Event){const item=form.items.find(i=>i.producto_id===id);if(item)item.cantidad=Math.max(0.01,Number((event.target as HTMLInputElement).value)||0.01);}
 function quitar(id:number){form.items=form.items.filter(i=>i.producto_id!==id);}
 function guardar(){form.post('/ventas/pedidos',{preserveScroll:true,onSuccess:()=>{vista.value='plano';form.reset();router.reload()}});}
 function cobrar(p:PedidoPendiente){if(!props.cajaAbierta){alert('Debes abrir una caja para cobrar.');return;}if(!confirm('¿Cobrar el pedido '+p.codigo+' por Bs '+moneda(p.total)+'?'))return;cobrando.value=p.id;router.post('/ventas/pedidos/'+p.id+'/cobrar',{metodo_pago:metodoCobro.value},{preserveScroll:true,onFinish:()=>{cobrando.value=null;}});}
@@ -61,7 +62,7 @@ function limpiar(m:Mesa){if(confirm('¿Marcar la mesa '+m.numero+' como libre?')
    <section class="resumen"><div class="encabezado-resumen"><button type="button" @click="vista='plano'"><ArrowLeft :size="21"/></button><strong>{{tipo==='MESA'?'MESA '+(mesaElegida?.numero??''):tipo==='LLEVAR'?'PARA LLEVAR':'YANGO'}} - NUEVO</strong></div>
     <div class="cliente"><select v-model="form.cliente_id"><option :value="null">Seleccionar cliente (opcional)</option><option v-for="c in clientes" :key="c.id" :value="c.id">{{c.nombre_completo}}</option></select><input v-model="form.nombre_cliente" placeholder="Nombre del cliente"/></div>
     <div class="cabecera-items"><span>PRODUCTO</span><span>CANT.</span><span>TOTAL</span></div>
-    <div class="items"><div v-for="i in itemsVista" :key="i.producto_id" class="linea"><div><strong>{{i.producto?.nombre}}</strong><button class="quitar" type="button" @click="quitar(i.producto_id)">Quitar</button></div><input v-model.number="form.items.find(x=>x.producto_id===i.producto_id)!.cantidad" type="number" min="0.01" step="0.01"/><b>{{moneda((Number(i.producto?.precio_venta)||0)*i.cantidad)}}</b></div><p v-if="!itemsVista.length" class="sin-items">Sin productos</p></div>
+    <div class="items"><div v-for="i in itemsVista" :key="i.producto_id" class="linea"><div><strong>{{i.producto?.nombre}}</strong><button class="quitar" type="button" @click="quitar(i.producto_id)">Quitar</button></div><input  :value="i.cantidad" @change="actualizarCantidad(i.producto_id, $event)" type="number" min="0.01" step="0.01"/><b>{{moneda((Number(i.producto?.precio_venta)||0)*i.cantidad)}}</b></div><p v-if="!itemsVista.length" class="sin-items">Sin productos</p></div>
     <label class="nota">NOTA COCINA:<textarea v-model="form.nota_cocina" rows="2" placeholder="Observaciones..."/></label>
     <div class="total"><strong>TOTAL</strong><strong>Bs. {{moneda(total)}}</strong></div>
     <p v-if="!cajaAbierta" class="advertencia">No tienes caja abierta. Puedes registrar el pedido, pero para cobrar necesitarás abrir una caja en Administrar Cajas.</p>
