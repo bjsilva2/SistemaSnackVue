@@ -16,6 +16,7 @@ class PedidoMesaController extends Controller {
   $productos->each(function($p){$p->imagen_url=$p->imagen?Storage::disk('public')->url($p->imagen):null;});
   return Inertia::render('Ventas/PedidosMesa',[
    'mesas'=>DB::table('mesas')->orderBy('numero')->get(),
+   'pedidosPendientes'=>DB::table('pedidos')->where('estado','!=','COBRADO')->orderByDesc('id')->get(['id','codigo','modalidad','mesa_id','nombre_cliente','total','estado']),
    'productos'=>$productos,
    'grupos'=>DB::table('grupo_productos')->where('estado',true)->orderBy('nombre')->get(['id','nombre']),
    'clientes'=>DB::table('clientes')->where('estado',true)->orderBy('nombre_completo')->get(['id','nombre_completo']),
