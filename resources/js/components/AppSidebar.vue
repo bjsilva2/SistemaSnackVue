@@ -62,10 +62,10 @@ const secciones = [
         icono: Store,
         items: [
             { titulo: 'Administrar Cajas', ruta: '/ventas/cajas', icono: Wallet },
-            { titulo: 'Punto de Venta', ruta: '/ventas/pos', icono: ShoppingCart },
-            { titulo: 'Plano de Mesas', ruta: '/ventas/mesas', icono: UtensilsCrossed },
-            { titulo: 'Pedidos de Cocina', ruta: '/ventas/cocina', icono: ChefHat },
-            { titulo: 'Listado de Clientes', ruta: '/ventas/clientes', icono: Users },
+            { titulo: 'Nuevo Pedido Mesa', ruta: '/ventas/pedidos', icono: UtensilsCrossed },
+            { titulo: 'Monitor Cocina', ruta: '/ventas/cocina', icono: ChefHat },
+            { titulo: 'Listado de Ventas', ruta: '/ventas/listado', icono: Receipt },
+            { titulo: 'Listado Clientes', ruta: '/ventas/clientes', icono: Users },
         ],
     },
     {
