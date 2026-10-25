@@ -12,6 +12,7 @@ use App\Http\Controllers\CompraRecepcionController;
 use App\Http\Controllers\PagoProveedorController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CajaController;
+use App\Http\Controllers\PedidoMesaController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -82,6 +83,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/catalogos/productos/{producto}/estado', [
         ProductoController::class, 'cambiarEstado'
     ])->name('productos.estado');
+
+    // PEDIDOS DE MESA / PARA LLEVAR / YANGO
+    Route::get('/ventas/pedidos', [PedidoMesaController::class, 'index'])->name('pedidos.index');
+    Route::post('/ventas/pedidos', [PedidoMesaController::class, 'store'])->name('pedidos.store');
+    Route::post('/ventas/pedidos/{pedido}/cobrar', [PedidoMesaController::class, 'cobrar'])->name('pedidos.cobrar');
+    Route::patch('/ventas/mesas/{mesa}/liberar', [PedidoMesaController::class, 'liberarMesa'])->name('mesas.liberar');
 
     // ADMINISTRAR CAJAS
     Route::get('/ventas/cajas', [CajaController::class, 'index'])->name('cajas.index');
