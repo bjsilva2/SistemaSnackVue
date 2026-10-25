@@ -11,6 +11,7 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CompraRecepcionController;
 use App\Http\Controllers\PagoProveedorController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\CajaController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -81,6 +82,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/catalogos/productos/{producto}/estado', [
         ProductoController::class, 'cambiarEstado'
     ])->name('productos.estado');
+
+    // ADMINISTRAR CAJAS
+    Route::get('/ventas/cajas', [CajaController::class, 'index'])->name('cajas.index');
+    Route::post('/ventas/cajas', [CajaController::class, 'store'])->name('cajas.store');
+    Route::patch('/ventas/cajas/{caja}/cerrar', [CajaController::class, 'cerrar'])->name('cajas.cerrar');
 
     // CLIENTES
     Route::get('/ventas/clientes', [ClienteController::class, 'index'])->name('clientes.index');
