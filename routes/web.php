@@ -13,6 +13,7 @@ use App\Http\Controllers\PagoProveedorController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\PedidoMesaController;
+use App\Http\Controllers\MonitorCocinaController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -89,6 +90,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/ventas/pedidos', [PedidoMesaController::class, 'store'])->name('pedidos.store');
     Route::post('/ventas/pedidos/{pedido}/cobrar', [PedidoMesaController::class, 'cobrar'])->name('pedidos.cobrar');
     Route::patch('/ventas/mesas/{mesa}/liberar', [PedidoMesaController::class, 'liberarMesa'])->name('mesas.liberar');
+
+    // MONITOR COCINA
+    Route::get('/ventas/cocina', [MonitorCocinaController::class, 'index'])->name('cocina.index');
+    Route::patch('/ventas/cocina/{pedido}/estado', [MonitorCocinaController::class, 'cambiarEstado'])->name('cocina.estado');
 
     // ADMINISTRAR CAJAS
     Route::get('/ventas/cajas', [CajaController::class, 'index'])->name('cajas.index');
