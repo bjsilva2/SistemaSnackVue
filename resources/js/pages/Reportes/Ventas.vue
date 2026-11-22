@@ -20,9 +20,9 @@ const fmt=(v:string|number|null|undefined)=>Number(v||0).toLocaleString('es-BO',
 function texto(v:string|null|undefined):string {
   if (!v) return '—';
   // Admitir fechas PostgreSQL, ISO y formatos locales sin convertir husos horarios.
-  const iso=v.match(/^(\\d{4})-(\\d{2})-(\\d{2})[T ](\\d{2}):(\\d{2})(?::(\\d{2}))?/);
+  const iso=v.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
   if(iso) return `${iso[3]}/${iso[2]}/${iso[1]} ${iso[4]}:${iso[5]}:${iso[6]||'00'}`;
-  const local=v.match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})[ T](\\d{2}):(\\d{2})(?::(\\d{2}))?/);
+  const local=v.match(/^(\d{2})\/(\d{2})\/(\d{4})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
   if(local) return `${local[1]}/${local[2]}/${local[3]} ${local[4]}:${local[5]}:${local[6]||'00'}`;
   return v;
 }
