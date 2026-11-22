@@ -17,6 +17,7 @@ use App\Http\Controllers\MonitorCocinaController;
 use App\Http\Controllers\ReporteVentasController;
 use App\Http\Controllers\ReporteComprasController;
 use App\Http\Controllers\ReporteCajasController;
+use App\Http\Controllers\ReporteStockController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -99,6 +100,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // REPORTE GENERAL DE CAJAS
     Route::get('/reportes/cajas', [ReporteCajasController::class, 'index'])->name('reportes.cajas');
     Route::get('/reportes/cajas/exportar', [ReporteCajasController::class, 'exportar'])->name('reportes.cajas.exportar');
+
+    // REPORTE GENERAL DE STOCK
+    Route::get('/reportes/stock', [ReporteStockController::class, 'index'])->name('reportes.stock');
+    Route::get('/reportes/stock/exportar', [ReporteStockController::class, 'exportar'])->name('reportes.stock.exportar');
 
     // PEDIDOS DE MESA / PARA LLEVAR / YANGO
     Route::get('/ventas/pedidos', [PedidoMesaController::class, 'index'])->name('pedidos.index');
