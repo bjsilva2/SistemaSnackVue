@@ -4,7 +4,7 @@ import { Head, router } from '@inertiajs/vue3';
 import { reactive } from 'vue';
 import { Search, FileText, FileSpreadsheet } from 'lucide-vue-next';
 
-type Caja={id:number;usuario:string;sucursal:string;fecha_apertura:string;fecha_cierre:string|null;monto_inicial:string|number;total_ventas:string|number;ingresos:string|number;egresos:string|number;saldo:string|number;estado:string};
+type Caja={id:number;usuario:string;sucursal:string;fecha_apertura:string;fecha_cierre:string|null;monto_inicial:string|number;total_ventas:string|number;ingresos:string|number;egresos:string|number;saldo:string|number;pago_qr:string|number;estado:string};
 type Pagina={data:Caja[];current_page:number;last_page:number;total:number};
 type Filtros={sucursal:string;codigo:string|number;usuario_id:string|number;estado:string;desde:string;hasta:string};
 const props=defineProps<{cajas:Pagina;filtros:Filtros;usuarios:{id:number;name:string}[];sucursales:string[]}>();
@@ -35,10 +35,10 @@ function imprimir(){window.print();}
 <div class="herramientas"><button class="pdf" type="button" @click="imprimir"><FileText :size="13"/> PDF Cajas / Imprimir</button><button class="excel" type="button" @click="exportar"><FileSpreadsheet :size="13"/> Exportar CSV</button></div>
 <div class="tabla"><table><thead><tr><th>⚙</th><th>CÓD.</th><th>USUARIO</th><th>F.APERTURA</th><th>F.CIERRE</th><th>S.INICIAL</th><th>T.VENTAS</th><th class="ingreso">INGRESOS</th><th class="egreso">EGRESOS</th><th>S.CAJA</th><th>ESTADO</th><th>PAGO QR</th></tr></thead>
 <tbody>
-<tr v-for="c in cajas.data" :key="c.id"><td>●</td><td>{{c.id}}</td><td>{{c.usuario}}</td><td>{{fecha(c.fecha_apertura)}}</td><td>{{fecha(c.fecha_cierre)}}</td><td class="num">{{dinero(c.monto_inicial)}}</td><td class="num">{{dinero(c.total_ventas)}}</td><td class="num verde">{{dinero(c.ingresos)}}</td><td class="num rojo">{{dinero(c.egresos)}}</td><td class="num">{{dinero(c.saldo)}}</td><td><span class="estado" :class="{abierta:c.estado==='ABIERTO'}">{{c.estado==='ABIERTO'?'ABIERTA':'CERRADA'}}</span></td><td class="num">—</td></tr>
+<tr v-for="c in cajas.data" :key="c.id"><td>●</td><td>{{c.id}}</td><td>{{c.usuario}}</td><td>{{fecha(c.fecha_apertura)}}</td><td>{{fecha(c.fecha_cierre)}}</td><td class="num">{{dinero(c.monto_inicial)}}</td><td class="num">{{dinero(c.total_ventas)}}</td><td class="num verde">{{dinero(c.ingresos)}}</td><td class="num rojo">{{dinero(c.egresos)}}</td><td class="num">{{dinero(c.saldo)}}</td><td><span class="estado" :class="{abierta:c.estado==='ABIERTO'}">{{c.estado==='ABIERTO'?'ABIERTA':'CERRADA'}}</span></td><td class="num">{{dinero(c.pago_qr)}}</td></tr>
 <tr v-if="!cajas.data.length"><td colspan="12" class="vacio">No hay cajas que coincidan con los filtros.</td></tr>
 </tbody></table></div>
-<p class="aviso">Los importes reflejan los movimientos registrados en cada caja. El desglose de pagos QR por caja no está almacenado de forma independiente en el modelo actual.</p>
+<p class="aviso">Los importes reflejan los movimientos registrados en cada caja. Los pagos QR se calculan a partir de los pedidos cobrados y vinculados a cada caja.</p>
 <footer class="pie"><span>Mostrando {{cajas.data.length}} de {{cajas.total}} cajas</span><div><button :disabled="cajas.current_page<=1" @click="pagina(cajas.current_page-1)">‹ Anterior</button><span>{{cajas.current_page}} / {{cajas.last_page}}</span><button :disabled="cajas.current_page>=cajas.last_page" @click="pagina(cajas.current_page+1)">Siguiente ›</button></div></footer>
 </main>
 </AppLayout>
