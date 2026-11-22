@@ -64,7 +64,7 @@ class ReporteVentasController extends Controller
     {
         $f = $this->filtros($request);
         // No se presumen ventas a crédito ni descuentos: el módulo actual solo registra efectivo o QR.
-        $totales = (clone $this->consulta($f))->selectRaw(
+        $totales = (clone $this->consulta($f))->select([])->selectRaw(
             "COALESCE(SUM(CASE WHEN p.estado = 'COBRADO' THEN p.total ELSE 0 END), 0) as total_ventas,
              COALESCE(SUM(CASE WHEN p.estado != 'COBRADO' THEN p.total ELSE 0 END), 0) as pendiente,
              COUNT(*) as registros"
