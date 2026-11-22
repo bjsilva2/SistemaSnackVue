@@ -27,6 +27,11 @@ class ReporteCajasController extends Controller
             ->select('c.id', 'u.name as usuario', 'c.sucursal', 'c.fecha_apertura',
                 'c.fecha_cierre', 'c.monto_inicial', 'c.total_ventas', 'c.ingresos',
                 'c.egresos', 'c.saldo', 'c.estado')
+            ->selectSub(function ($q) {
+                $q->from('pedidos as p')->selectRaw('COALESCE(SUM(p.total), 0)')
+                    ->whereColumn('p.caja_id', 'c.id')->where('p.estado', 'COBRADO')
+                    ->where('p.metodo_pago', 'QR');
+            }, 'pago_qr')
             ->when(!empty($f['sucursal']) && $f['sucursal'] !== 'TODAS',
                 fn ($q) => $q->where('c.sucursal', $f['sucursal']))
             ->when(!empty($f['codigo']), fn ($q) => $q->where('c.id', $f['codigo']))
@@ -34,7 +39,7 @@ class ReporteCajasController extends Controller
             ->when(!empty($f['estado']) && $f['estado'] !== 'TODOS',
                 fn ($q) => $q->where('c.estado', $f['estado']))
             ->when(!empty($f['desde']), fn ($q) => $q->whereDate('c.fecha_apertura', '>=', $f['desde']))
-            ->when(!empty($f['hasta']), fn ($q) => $q->whereDate('c.fecha_apertura', '<=', $f['hasta']));
+            ->when(!empty($f['hasta']), fn ($q) => $q->whereDate('c.fecha_cierre', '<=', $f['hasta']));
     }
 
     public function index(Request $request)
@@ -59,11 +64,11 @@ class ReporteCajasController extends Controller
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, ['Codigo', 'Usuario', 'Sucursal', 'Apertura', 'Cierre', 'Monto inicial Bs',
-                'Ventas Bs', 'Ingresos Bs', 'Egresos Bs', 'Saldo Bs', 'Estado'], ';');
+                'Ventas Bs', 'Ingresos Bs', 'Egresos Bs', 'Saldo Bs', 'Pago QR Bs', 'Estado'], ';');
             foreach ($registros as $r) {
                 fputcsv($out, [$r->id, $r->usuario, $r->sucursal, $r->fecha_apertura,
                     $r->fecha_cierre, $r->monto_inicial, $r->total_ventas,
-                    $r->ingresos, $r->egresos, $r->saldo, $r->estado], ';');
+                    $r->ingresos, $r->egresos, $r->saldo, $r->pago_qr, $r->estado], ';');
             }
             fclose($out);
         }, 'reporte-cajas-'.now()->format('Ymd-His').'.csv',
