@@ -18,6 +18,7 @@ use App\Http\Controllers\ReporteVentasController;
 use App\Http\Controllers\ReporteComprasController;
 use App\Http\Controllers\ReporteCajasController;
 use App\Http\Controllers\ReporteStockController;
+use App\Http\Controllers\InformeMensualController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -104,6 +105,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // REPORTE GENERAL DE STOCK
     Route::get('/reportes/stock', [ReporteStockController::class, 'index'])->name('reportes.stock');
     Route::get('/reportes/stock/exportar', [ReporteStockController::class, 'exportar'])->name('reportes.stock.exportar');
+
+    // INFORME MENSUAL Y GESTIÓN
+    Route::get('/reportes/mensual', [InformeMensualController::class, 'index'])->name('reportes.mensual');
 
     // PEDIDOS DE MESA / PARA LLEVAR / YANGO
     Route::get('/ventas/pedidos', [PedidoMesaController::class, 'index'])->name('pedidos.index');
