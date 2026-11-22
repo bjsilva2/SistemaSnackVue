@@ -15,8 +15,17 @@ const props=defineProps<{ventas:Pagina;totales:{total_ventas:string|number;pendi
 const form=reactive<Filtros>({...props.filtros});
 const expandidos=ref<number[]>([]);
 const detallesVisibles=computed(()=>props.ventas.data.length>0);
+const tipoPedido=(v:string)=>v==='LLEVAR'?'PARA LLEVAR':v==='MESA'?'MESA':v==='YANGO'?'YANGO':v;
 const fmt=(v:string|number|null|undefined)=>Number(v||0).toLocaleString('es-BO',{minimumFractionDigits:2,maximumFractionDigits:2});
-const texto=(v:string|null|undefined)=>v?.replace('T',' ').slice(0,19)||'—';
+function texto(v:string|null|undefined):string {
+  if (!v) return '—';
+  // Admitir fechas PostgreSQL, ISO y formatos locales sin convertir husos horarios.
+  const iso=v.match(/^(\\d{4})-(\\d{2})-(\\d{2})[T ](\\d{2}):(\\d{2})(?::(\\d{2}))?/);
+  if(iso) return `${iso[3]}/${iso[2]}/${iso[1]} ${iso[4]}:${iso[5]}:${iso[6]||'00'}`;
+  const local=v.match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})[ T](\\d{2}):(\\d{2})(?::(\\d{2}))?/);
+  if(local) return `${local[1]}/${local[2]}/${local[3]} ${local[4]}:${local[5]}:${local[6]||'00'}`;
+  return v;
+}
 const query=()=>Object.fromEntries(Object.entries(form).filter(([,v])=>v!=='')) as Record<string,string>;
 function buscar(){router.get('/reportes/ventas',query(),{preserveState:true,replace:true,onSuccess:()=>{expandidos.value=[]}});}
 function pagina(n:number){router.get('/reportes/ventas',{...query(),page:String(n)},{preserveState:true,replace:true,onSuccess:()=>{expandidos.value=[]}});}
@@ -30,7 +39,7 @@ function imprimir(){window.print();}
 <template>
 <Head title="Reporte General de Ventas"/>
 <AppLayout>
-<main class="pagina">
+<main class="pagina notranslate" translate="no">
   <div class="miga">REPORTES <span>›</span> <strong>VENTAS</strong></div>
   <h1>REPORTE GENERAL DE VENTAS</h1>
   <form class="filtros" @submit.prevent="buscar">
@@ -59,13 +68,13 @@ function imprimir(){window.print();}
         <template v-for="v in ventas.data" :key="v.id">
           <tr><td><button type="button" class="flecha" @click="alternar(v.id)"><ChevronDown v-if="expandidos.includes(v.id)" :size="13"/><ChevronRight v-else :size="13"/></button></td>
             <td>{{v.codigo}}</td><td>{{v.usuario}}</td><td>{{texto(v.fecha_venta)}}</td><td>{{v.cliente_registrado||v.nombre_cliente||'Sin nombre'}}</td>
-            <td>{{v.ci_nit||'—'}}</td><td><span class="modalidad">{{v.modalidad==='LLEVAR'?'PARA LLEVAR':v.modalidad}}</span></td>
+            <td>{{v.ci_nit||'—'}}</td><td><span class="modalidad">{{tipoPedido(v.modalidad)}}</span></td>
             <td class="numero">{{v.metodo_pago==='EFECTIVO'?fmt(v.total):'0,00'}}</td><td class="numero">{{v.metodo_pago==='QR'?fmt(v.total):'0,00'}}</td>
             <td class="numero">{{fmt(v.total)}}</td>
             <td><span class="estado" :class="v.estado==='COBRADO'?'valida':'pendiente'">{{v.estado==='COBRADO'?'VÁLIDA':'PENDIENTE'}}</span></td>
             <td><button type="button" class="ver" title="Ver detalle" @click="alternar(v.id)">⋮</button></td>
           </tr>
-          <tr v-if="expandidos.includes(v.id)" class="detalle"><td colspan="12"><b>Pedido:</b> {{v.codigo}} · <b>Tipo:</b> {{v.modalidad}} · <b>Pago:</b> {{v.metodo_pago||'Sin cobrar'}} · <b>Fecha cobro:</b> {{texto(v.cobrado_at)}} · <b>Total:</b> Bs {{fmt(v.total)}}</td></tr>
+          <tr v-if="expandidos.includes(v.id)" class="detalle"><td colspan="12"><b>Pedido:</b> {{v.codigo}} · <b>Tipo:</b> {{tipoPedido(v.modalidad)}} · <b>Pago:</b> {{v.metodo_pago||'Sin cobrar'}} · <b>Fecha cobro:</b> {{texto(v.cobrado_at)}} · <b>Total:</b> Bs {{fmt(v.total)}}</td></tr>
         </template>
         <tr v-if="!detallesVisibles"><td class="sin-resultados" colspan="12"><div class="icono">ⓘ</div>Debe aplicar filtros para ver resultados en la tabla o no existen ventas coincidentes.</td></tr>
       </tbody>
