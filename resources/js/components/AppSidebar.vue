@@ -73,7 +73,6 @@ const secciones = [
         icono: ChartNoAxesCombined,
         items: [
             { titulo: 'Reporte General Ventas', ruta: '/reportes/ventas', icono: Receipt },
-            { titulo: 'Informe Ganancias', ruta: '/reportes/ganancias', icono: ChartNoAxesCombined },
             { titulo: 'Informe Mensual y Gestión', ruta: '/reportes/mensual', icono: ChartNoAxesCombined },
             { titulo: 'Reporte de Compras', ruta: '/reportes/compras', icono: ClipboardList },
             { titulo: 'Reporte de Stock', ruta: '/reportes/stock', icono: Package },
