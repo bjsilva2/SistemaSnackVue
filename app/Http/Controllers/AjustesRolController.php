@@ -11,7 +11,7 @@ use Inertia\Inertia;
 class AjustesRolController extends Controller
 {
     public const MODULOS = [
-        'Dashboard'=>['ver'],
+        'Dashboard'=>['ver','ProductosStockCero','ProductosStockMin','Productos+Vendidos'],
         'Catálogos'=>['listar','crear','editar'],
         'Unidad'=>['listar','crear','editar'],
         'Producto'=>['listar','crear','editar','detalle','actualizar'],
@@ -25,11 +25,8 @@ class AjustesRolController extends Controller
         'Usuarios'=>['listar','crear','editar'],
         'Roles'=>['listar','crear','editar','asignar_permisos','eliminar'],
     ];
-    // Acciones visibles en la captura original pero todavía sin una operación
-    // equivalente implementada en SistemaSnackVue. Se muestran deshabilitadas:
-    // no se guardan como permisos ni conceden acceso a operaciones inexistentes.
+    // Acciones de referencia pendientes: configurables para futuro desarrollo, sin conceder operaciones inexistentes.
     public const PENDIENTES = [
-        'Dashboard'=>['ProductosStockCero','ProductosStockMin','Productos+Vendidos'],
         'Laboratorio'=>['Listar','Crear','Editar','Detalle','Eliminar'],
         'Unidad'=>['Eliminar'],
         'Producto'=>['Eliminar','VerImagen'],
