@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
+import { usePermissions } from '@/composables/usePermissions';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { ClipboardList, RefreshCw, LogOut, CheckCircle2, Clock3, ChefHat } from 'lucide-vue-next';
 
 type Item = { pedido_id:number; nombre:string; cantidad:number|string };
 type Pedido = { id:number; codigo:string; modalidad:string; nombre_cliente:string|null; nota_cocina:string|null; cocina_estado:'EN_COCINA'|'LISTO'; created_at:string; cocina_listo_at:string|null; mesa_numero:number|null; items:Item[] };
 const props = defineProps<{pedidos:Pedido[];horaServidor:string}>();
+const { can } = usePermissions();
 const filtro=ref<'TODOS'|'EN_COCINA'|'LISTO'>('TODOS');
 const ahora=ref(Date.parse(props.horaServidor));
 let reloj:ReturnType<typeof setInterval>|undefined;
@@ -26,7 +28,7 @@ const relojTexto=computed(()=>new Date(ahora.value).toLocaleTimeString('es-BO',{
 <div class="monitor">
  <header class="barra-superior">
    <div class="marca"><ClipboardList :size="23"/><div><div class="titulo"><span>🍳</span> PEDIDOS DE COCINA</div><small>Sistema de visualización de pedidos</small></div></div>
-   <div class="herramientas"><button type="button" class="refrescar" @click="actualizar"><RefreshCw :size="13"/> Actualizar</button><b>{{relojTexto}}</b><a href="/ventas/pedidos" class="volver" title="Volver a pedidos"><LogOut :size="15"/></a></div>
+   <div class="herramientas"><button type="button" class="refrescar" @click="actualizar"><RefreshCw :size="13"/> Actualizar</button><b>{{relojTexto}}</b><a href="/ventas/pedidos" class="volver" v-if="can('Venta.listar')" title="Volver a pedidos"><LogOut :size="15"/></a></div>
  </header>
  <main class="cuerpo">
   <nav class="filtros" aria-label="Filtros de pedidos">
@@ -42,7 +44,7 @@ const relojTexto=computed(()=>new Date(ahora.value).toLocaleTimeString('es-BO',{
     </div><span v-if="p.cocina_estado==='EN_COCINA'" class="urgente">¡URGENTE!</span><span v-else class="listo-etiqueta">LISTO</span></div>
     <div class="productos"><div v-for="(item,i) in p.items" :key="i" class="item"><span class="cantidad">{{Number(item.cantidad)}}x</span><strong>{{item.nombre}}</strong></div></div>
     <p v-if="p.nota_cocina" class="nota">NOTA: {{p.nota_cocina}}</p>
-    <footer v-if="p.cocina_estado==='EN_COCINA'"><button type="button" :disabled="procesando===p.id" @click="marcarListo(p)"><CheckCircle2 :size="15"/> MARCAR LISTO</button></footer>
+    <footer v-if="p.cocina_estado==='EN_COCINA'&&can('Cocina.marcar_listo')"><button type="button" :disabled="procesando===p.id" @click="marcarListo(p)"><CheckCircle2 :size="15"/> MARCAR LISTO</button></footer>
    </article>
   </section>
   <div v-if="!filtrados.length" class="vacio"><ChefHat :size="35"/><strong>No hay pedidos en esta sección</strong><p>Los nuevos pedidos aparecerán aquí al registrarlos en Nuevo Pedido Mesa.</p></div>
