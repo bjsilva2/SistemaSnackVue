@@ -86,7 +86,7 @@ const secciones = [
             { titulo: 'Empresa', ruta: '/ajustes/empresa', icono: Store },
             { titulo: 'Sucursales', ruta: '/ajustes/sucursales', icono: House },
             { titulo: 'Usuarios', ruta: '/ajustes/usuarios', icono: Users },
-            { titulo: 'Roles y Permisos', ruta: '/ajustes/roles', icono: Settings },
+            { titulo: 'Roles', ruta: '/ajustes/roles', icono: Settings },
         ],
     },
 ];
