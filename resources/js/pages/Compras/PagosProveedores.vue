@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Search, X, Save, MoreVertical } from 'lucide-vue-next';
@@ -10,6 +11,7 @@ const f=ref({sucursal:String(props.filtros.sucursal??''),nro_orden:String(props.
 const modal=ref(false);const seleccion=ref<Compra|null>(null);
 const form=useForm({recepcion_id:0,monto:0,metodo_pago:'EFECTIVO',observaciones:''});
 const dinero=(v:number|string)=>Number(v).toLocaleString('es-BO',{minimumFractionDigits:2,maximumFractionDigits:2});
+const { can } = usePermissions();
 const filtrar=()=>router.get('/compras/pagos',f.value,{preserveState:true,replace:true});
 const pagina=(n:number)=>router.get('/compras/pagos',{...f.value,page:n},{preserveState:true});
 function abrir(c:Compra){seleccion.value=c;form.reset();form.clearErrors();form.recepcion_id=c.id;form.monto=Number(c.saldo);modal.value=true}
@@ -43,7 +45,7 @@ function guardar(){form.post('/compras/pagos',{preserveScroll:true,onSuccess:()=
 <td class="num">{{dinero(c.transferencia_total)}}</td>
 <td class="num">{{dinero(c.saldo)}}</td>
 <td><span class="estado" :class="{pendiente:Number(c.saldo)>0}">{{Number(c.saldo)>0?'PENDIENTE':'PAGADO'}}</span></td>
-<td><button type="button" class="acciones" :disabled="Number(c.saldo)<=0" :title="Number(c.saldo)>0?'Registrar pago':'Compra pagada'" @click="abrir(c)"><MoreVertical :size="15"/></button></td>
+<td><button type="button" class="acciones" v-if="can('Proveedor.pagos')" :disabled="Number(c.saldo)<=0" :title="Number(c.saldo)>0?'Registrar pago':'Compra pagada'" @click="abrir(c)"><MoreVertical :size="15"/></button></td>
 </tr>
 <tr v-if="compras.data.length===0"><td colspan="10" class="vacio">No hay pagos a proveedores registrados.</td></tr>
 </tbody></table></div>
