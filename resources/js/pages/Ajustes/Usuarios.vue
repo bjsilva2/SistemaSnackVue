@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { Plus, MoreVertical, Search, X } from 'lucide-vue-next';
 type Usuario={id:number;name:string;email:string;rol_id:number|null;rol_nombre:string|null;created_at:string;updated_at:string};
 type Pagina={data:Usuario[];total:number;current_page:number;last_page:number};
 const props=defineProps<{usuarios:Pagina;roles:{id:number;nombre:string}[];filtros:{buscar:string};usuarioActual:number}>();
+const { can } = usePermissions();
 const buscar=ref(props.filtros.buscar||'');
 const modal=ref(false);const editar=ref<number|null>(null);
 const form=useForm({name:'',email:'',rol_id:'' as string,password:'',password_confirmation:''});
@@ -18,10 +20,10 @@ function fecha(x:string){const m=x?.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(
 </script>
 <template><Head title="Administrar Usuarios"/><AppLayout><main class="pagina" translate="no">
 <div class="miga">Configuraciones › <b>Usuarios</b></div><div class="panel">
-<header><h1>Administrar Usuarios <span class="contador">{{usuarios.total}}</span></h1><button class="nuevo" @click="abrir()"><Plus :size="15"/> NUEVO USUARIO</button></header>
+<header><h1>Administrar Usuarios <span class="contador">{{usuarios.total}}</span></h1><button class="nuevo" v-if="can('Usuarios.crear')" @click="abrir()"><Plus :size="15"/> NUEVO USUARIO</button></header>
 <form class="buscador" @submit.prevent="filtrar"><Search :size="13"/><input v-model="buscar" placeholder="Buscar..."/><button type="submit">Buscar</button></form>
 <div class="tabla"><table><thead><tr><th>CÓDIGO ⇅</th><th>NOMBRE</th><th>CORREO ELECTRÓNICO</th><th>ROLES DE USUARIO</th><th>FECHA DE CREACIÓN</th><th>ÚLTIMA MODIFICACIÓN</th><th>ACCIONES</th></tr></thead>
-<tbody><tr v-for="u in usuarios.data" :key="u.id"><td>{{u.id}}</td><td>{{u.name}}</td><td>{{u.email}}</td><td><span class="rol">{{u.rol_nombre||'SIN ROL'}}</span></td><td>{{fecha(u.created_at)}}</td><td>{{fecha(u.updated_at)}}</td><td><button class="opciones" title="Editar usuario" @click="abrir(u)"><MoreVertical :size="15"/></button></td></tr><tr v-if="!usuarios.data.length"><td colspan="7" class="vacio">Sin usuarios para mostrar.</td></tr></tbody></table></div>
+<tbody><tr v-for="u in usuarios.data" :key="u.id"><td>{{u.id}}</td><td>{{u.name}}</td><td>{{u.email}}</td><td><span class="rol">{{u.rol_nombre||'SIN ROL'}}</span></td><td>{{fecha(u.created_at)}}</td><td>{{fecha(u.updated_at)}}</td><td><button class="opciones" v-if="can('Usuarios.editar')" title="Editar usuario" @click="abrir(u)"><MoreVertical :size="15"/></button></td></tr><tr v-if="!usuarios.data.length"><td colspan="7" class="vacio">Sin usuarios para mostrar.</td></tr></tbody></table></div>
 <footer class="pie"><span>Mostrando {{usuarios.data.length}} de {{usuarios.total}} usuarios</span><div><button :disabled="usuarios.current_page<=1" @click="pagina(usuarios.current_page-1)">‹</button><span>{{usuarios.current_page}}</span><button :disabled="usuarios.current_page>=usuarios.last_page" @click="pagina(usuarios.current_page+1)">›</button></div></footer>
 </div>
 <div v-if="modal" class="fondo" @click.self="modal=false"><section class="modal"><header><h2>{{titulo}}</h2><button @click="modal=false"><X :size="17"/></button></header><form @submit.prevent="guardar">
