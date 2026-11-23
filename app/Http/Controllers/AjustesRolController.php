@@ -78,7 +78,9 @@ class AjustesRolController extends Controller
     {
         $this->admin($request);
         $claves=[];
+        // Permitir configurar tanto funciones existentes como opciones futuras de la referencia.
         foreach(self::MODULOS as $modulo=>$acciones)foreach($acciones as $accion)$claves[]=$modulo.'.'.$accion;
+        foreach(self::PENDIENTES as $modulo=>$acciones)foreach($acciones as $accion)$claves[]=$modulo.'.'.$accion;
         $data=$request->validate([
             'permisos'=>['present','array'],
             'permisos.*'=>['string',Rule::in($claves)],
