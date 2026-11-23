@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { Plus, ArrowLeft, RefreshCw, UtensilsCrossed, ShoppingBag, Car, Search, CreditCard } from 'lucide-vue-next';
@@ -10,6 +11,7 @@ type Grupo={id:number;nombre:string};
 type Cliente={id:number;nombre_completo:string};
 type PedidoPendiente={id:number;codigo:string;modalidad:string;mesa_id:number|null;nombre_cliente:string|null;total:string|number;estado:string};
 const props=defineProps<{mesas:Mesa[];productos:Producto[];grupos:Grupo[];clientes:Cliente[];cajaAbierta:boolean;pedidosPendientes:PedidoPendiente[]}>();
+const { can } = usePermissions();
 const vista=ref<'plano'|'pedido'>('plano');
 const tipo=ref<'MESA'|'LLEVAR'|'YANGO'>('MESA');
 const filtro=ref('');
@@ -40,15 +42,15 @@ function limpiar(m:Mesa){if(confirm('¿Marcar la mesa '+m.numero+' como libre?')
  <template v-if="vista==='plano'">
   <header class="titulo">
    <div><h1>Plano Visual de Mesas</h1><div class="leyenda"><span class="libre">● Libres</span> · <span class="ocupada">● Ocupadas</span> · <span class="limpiar">● Para llevar a limpiar</span> · <span class="yango">● Yango</span></div></div>
-   <div class="acciones"><button class="amarillo" type="button" title="Edición del layout pendiente" disabled>Editar Layout</button><button class="actualizar" type="button" @click="router.reload()"><RefreshCw :size="15"/></button><button class="lista" type="button" @click="crear('LLEVAR')"><ShoppingBag :size="14"/> Para Llevar</button><button class="yango-boton" type="button" @click="crear('YANGO')"><Car :size="14"/> Yango</button></div>
+   <div class="acciones"><button class="amarillo" type="button" title="Edición del layout pendiente" disabled>Editar Layout</button><button class="actualizar" type="button" @click="router.reload()"><RefreshCw :size="15"/></button><button class="lista" v-if="can('Venta.crear')" type="button" @click="crear('LLEVAR')"><ShoppingBag :size="14"/> Para Llevar</button><button class="yango-boton" v-if="can('Venta.crear')" type="button" @click="crear('YANGO')"><Car :size="14"/> Yango</button></div>
   </header>
   <div class="plano"><div class="piso">PISO 1</div><div class="mesas">
-   <button v-for="m in mesas" :key="m.id" type="button" class="mesa" :class="{ocupada:m.estado==='OCUPADA',sucia:m.estado==='POR_LIMPIAR'}" @click="m.estado==='LIBRE'?crear('MESA',m):m.estado==='POR_LIMPIAR'?limpiar(m):undefined"><span>{{m.numero}}</span><small><UtensilsCrossed :size="11"/> {{m.capacidad}}p</small><em v-if="m.estado==='OCUPADA'">OCUPADA</em><em v-if="m.estado==='POR_LIMPIAR'">POR LIMPIAR</em></button>
+   <button v-for="m in mesas" :key="m.id" type="button" class="mesa" :disabled="(m.estado==='LIBRE'&&!can('Venta.crear'))||(m.estado==='POR_LIMPIAR'&&!can('Venta.detalle'))" :class="{ocupada:m.estado==='OCUPADA',sucia:m.estado==='POR_LIMPIAR'}" @click="m.estado==='LIBRE'?crear('MESA',m):m.estado==='POR_LIMPIAR'?limpiar(m):undefined"><span>{{m.numero}}</span><small><UtensilsCrossed :size="11"/> {{m.capacidad}}p</small><em v-if="m.estado==='OCUPADA'">OCUPADA</em><em v-if="m.estado==='POR_LIMPIAR'">POR LIMPIAR</em></button>
   </div></div>
   <section class="pendientes">
    <header><h2>Pedidos pendientes de cobro ({{pedidosPendientes.length}})</h2><div><label>MÉTODO DE PAGO: <select v-model="metodoCobro"><option value="EFECTIVO">EFECTIVO</option><option value="QR">QR</option></select></label></div></header>
    <p v-if="!cajaAbierta" class="advertencia">Debes abrir una caja en Administrar Cajas para cobrar pedidos.</p>
-   <div class="lista-pedidos"><div v-for="p in pedidosPendientes" :key="p.id" class="pedido-pendiente"><div><b>{{p.codigo}}</b><span>{{p.modalidad}} · {{p.nombre_cliente||'Sin nombre'}}</span></div><strong>Bs {{moneda(p.total)}}</strong><button type="button" :disabled="!cajaAbierta||cobrando===p.id" @click="cobrar(p)"><CreditCard :size="13"/> COBRAR</button></div><p v-if="!pedidosPendientes.length" class="sin-items">Sin pedidos pendientes.</p></div>
+   <div class="lista-pedidos"><div v-for="p in pedidosPendientes" :key="p.id" class="pedido-pendiente"><div><b>{{p.codigo}}</b><span>{{p.modalidad}} · {{p.nombre_cliente||'Sin nombre'}}</span></div><strong>Bs {{moneda(p.total)}}</strong><button type="button" v-if="can('Venta.cobrar')" :disabled="!cajaAbierta||cobrando===p.id" @click="cobrar(p)"><CreditCard :size="13"/> COBRAR</button></div><p v-if="!pedidosPendientes.length" class="sin-items">Sin pedidos pendientes.</p></div>
   </section>
   <p class="aviso">Las mesas ocupadas permanecen bloqueadas hasta el cobro. Al cobrar pasan a «Por limpiar».</p>
  </template>
@@ -67,7 +69,7 @@ function limpiar(m:Mesa){if(confirm('¿Marcar la mesa '+m.numero+' como libre?')
     <div class="total"><strong>TOTAL</strong><strong>Bs. {{moneda(total)}}</strong></div>
     <p v-if="!cajaAbierta" class="advertencia">No tienes caja abierta. Puedes registrar el pedido, pero para cobrar necesitarás abrir una caja en Administrar Cajas.</p>
     <p v-if="form.hasErrors" class="errores"><span v-for="(e,k) in form.errors" :key="k">{{e}} </span></p>
-    <button class="guardar" type="button" :disabled="form.processing||form.items.length===0||(tipo==='MESA'&&!mesaElegida)" @click="guardar">REGISTRAR PEDIDO</button>
+    <button class="guardar" v-if="can('Venta.crear')" type="button" :disabled="form.processing||form.items.length===0||(tipo==='MESA'&&!mesaElegida)" @click="guardar">REGISTRAR PEDIDO</button>
     <p class="aclaracion">El cobro se realiza después de registrar el pedido. No se descontará stock hasta cobrar.</p>
    </section>
   </div>
