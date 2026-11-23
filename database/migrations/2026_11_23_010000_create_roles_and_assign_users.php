@@ -21,11 +21,14 @@ return new class extends Migration {
                 'permisos'=>json_encode($nombre==='Administrador'?['*']:[]),
                 'created_at'=>now(),'updated_at'=>now()]);
         }
-        // Asignar administrador solo a la cuenta existente más antigua, sin modificar contraseñas.
-        $primero = DB::table('users')->orderBy('id')->value('id');
-        if ($primero) DB::table('users')->where('id',$primero)->update([
-            'rol_id'=>DB::table('roles')->where('nombre','Administrador')->value('id'),
-        ]);
+        // Conserva acceso administrativo para la cuenta principal existente.
+        // Si hay una cuenta llamada admin, priorizarla; en otro caso usar la más antigua.
+        $administrador = DB::table('roles')->where('nombre','Administrador')->value('id');
+        $primero = DB::table('users')->whereRaw('LOWER(name) = ?', ['admin'])
+            ->orderBy('id')->value('id')
+            ?? DB::table('users')->orderBy('id')->value('id');
+        if ($primero) DB::table('users')->where('id',$primero)
+            ->update(['rol_id'=>$administrador]);
     }
     public function down(): void {
         Schema::table('users', fn(Blueprint $table)=>$table->dropConstrainedForeignId('rol_id'));
