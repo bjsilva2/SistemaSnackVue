@@ -23,7 +23,7 @@ class AjustesRolController extends Controller
         'Clientes'=>['listar','crear','editar'],
         'Reportes'=>['listar','exportar'],
         'Usuarios'=>['listar','crear','editar'],
-        'Roles'=>['listar','crear','editar','asignar_permisos'],
+        'Roles'=>['listar','crear','editar','asignar_permisos','eliminar'],
     ];
     // Acciones visibles en la captura original pero todavía sin una operación
     // equivalente implementada en SistemaSnackVue. Se muestran deshabilitadas:
