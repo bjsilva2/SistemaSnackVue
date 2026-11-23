@@ -64,7 +64,7 @@ class AjustesRolController extends Controller
         $claves=[];
         foreach(self::MODULOS as $modulo=>$acciones)foreach($acciones as $accion)$claves[]=$modulo.'.'.$accion;
         $data=$request->validate([
-            'permisos'=>['required','array'],
+            'permisos'=>['present','array'],
             'permisos.*'=>['string',Rule::in($claves)],
         ]);
         $actual=DB::table('roles')->where('id',$rol)->first();
