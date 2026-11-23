@@ -19,6 +19,8 @@ use App\Http\Controllers\ReporteComprasController;
 use App\Http\Controllers\ReporteCajasController;
 use App\Http\Controllers\ReporteStockController;
 use App\Http\Controllers\InformeMensualController;
+use App\Http\Controllers\AjustesUsuarioController;
+use App\Http\Controllers\AjustesRolController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -26,7 +28,19 @@ Route::get('/', function () {
 })->name('home');
 
 // Rutas protegidas
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'module.permission'])->group(function () {
+
+    // ADMINISTRAR USUARIOS
+    Route::get('/ajustes/usuarios', [AjustesUsuarioController::class, 'index'])->name('ajustes.usuarios');
+    Route::post('/ajustes/usuarios', [AjustesUsuarioController::class, 'store'])->name('ajustes.usuarios.store');
+    Route::put('/ajustes/usuarios/{usuario}', [AjustesUsuarioController::class, 'update'])->name('ajustes.usuarios.update');
+
+    // ADMINISTRAR ROLES Y PERMISOS
+    Route::get('/ajustes/roles', [AjustesRolController::class, 'index'])->name('ajustes.roles');
+    Route::post('/ajustes/roles', [AjustesRolController::class, 'store'])->name('ajustes.roles.store');
+    Route::put('/ajustes/roles/{rol}', [AjustesRolController::class, 'update'])->name('ajustes.roles.update');
+    Route::put('/ajustes/roles/{rol}/permisos', [AjustesRolController::class, 'permisos'])->name('ajustes.roles.permisos');
+    Route::delete('/ajustes/roles/{rol}', [AjustesRolController::class, 'destroy'])->name('ajustes.roles.destroy');
 
     // PANEL PRINCIPAL
     Route::get('/dashboard', function () {
