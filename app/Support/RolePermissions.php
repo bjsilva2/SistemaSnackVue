@@ -21,6 +21,28 @@ class RolePermissions
         return $permissions['admin'] || in_array($key, $permissions['granted'], true);
     }
 
+    public static function landingPath(array $permissions): string
+    {
+        $pages = [
+            'Dashboard.ver'=>'/dashboard',
+            'Cocina.listar'=>'/ventas/cocina',
+            'Venta.listar'=>'/ventas/pedidos',
+            'Caja.listar'=>'/ventas/cajas',
+            'Compra.listar'=>'/compras/ordenes',
+            'Proveedor.listar'=>'/compras/proveedores',
+            'Proveedor.pagos'=>'/compras/pagos',
+            'Producto.listar'=>'/catalogos/productos',
+            'Catálogos.listar'=>'/catalogos/grupos',
+            'Unidad.listar'=>'/catalogos/unidades',
+            'Clientes.listar'=>'/ventas/clientes',
+            'Reportes.listar'=>'/reportes/ventas',
+        ];
+        foreach ($pages as $permission=>$path) {
+            if (self::allows($permissions, $permission)) return $path;
+        }
+        return '/settings/profile';
+    }
+
     // Cada ruta se vincula con UNA operación autorizada; nunca inferir solo por prefijo.
     public const ROUTES = [
         'dashboard'=>'Dashboard.ver',
