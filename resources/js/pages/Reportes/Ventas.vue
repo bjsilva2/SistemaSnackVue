@@ -62,7 +62,7 @@ function imprimir(){window.print();}
     <div>TOTAL GENERAL: <b class="verde">{{fmt(totales.total_ventas)}} Bs.</b></div>
     <p>Los totales corresponden a todos los resultados del filtro. Ventas a crédito y descuentos no están implementados en los pedidos actuales.</p>
   </section>
-  <div class="herramientas"><button type="button" class="azul-btn" @click="plegarTodo">− Contraer Todo</button><button type="button" class="azul-btn" @click="abrirTodo">＋ Expandir Todo</button><button type="button" class="pdf" @click="imprimir"><FileText :size="13"/> PDF / Imprimir</button><button type="button" class="excel" v-if="can('Reportes.exportar')" @click="csv"><FileSpreadsheet :size="13"/> CSV Exportar</button></div>
+  <div class="herramientas"><button type="button" class="azul-btn" @click="plegarTodo">− Contraer Todo</button><button type="button" class="azul-btn" @click="abrirTodo">＋ Expandir Todo</button><button type="button" class="pdf" v-if="can('Reportes.exportar')" @click="imprimir"><FileText :size="13"/> PDF / Imprimir</button><button type="button" class="excel" v-if="can('Reportes.exportar')" @click="csv"><FileSpreadsheet :size="13"/> CSV Exportar</button></div>
   <div class="tabla">
     <table>
       <thead><tr><th></th><th>CÓD</th><th>USUARIO</th><th>FECHA VENTA</th><th>CLIENTE</th><th>CI/NIT</th><th>TIPO PEDIDO</th><th>EFECTIVO</th><th>QR</th><th>T.VENTA</th><th>ESTADO</th><th><Settings2 :size="14"/></th></tr></thead>
