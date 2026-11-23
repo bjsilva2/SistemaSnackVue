@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref, onBeforeUnmount } from 'vue';
 import { Plus, Search, Pencil, Power, X, Save, Package, Tags, DollarSign, FileText, ImagePlus, Trash2 } from 'lucide-vue-next';
@@ -22,6 +23,7 @@ const props = defineProps<{
     unidades: Catalogo[]; filtros: { buscar: string };
 }>();
 
+const { can } = usePermissions();
 const buscar = ref(props.filtros.buscar || '');
 const modal = ref(false);
 const editando = ref<number | null>(null);
@@ -158,7 +160,7 @@ onBeforeUnmount(limpiarTemporal);
                     <p class="ruta">Catálogos / Productos y Servicios</p>
                     <h1>Administrar Productos y Servicios <span class="contador">{{ productos.total }}</span></h1>
                 </div>
-                <button type="button" class="btn-azul" @click="nuevo"><Plus :size="17" /> Nuevo</button>
+                <button type="button" class="btn-azul" v-if="can('Producto.crear')" @click="nuevo"><Plus :size="17" /> Nuevo</button>
             </div>
 
             <div class="tarjeta">
@@ -197,8 +199,8 @@ onBeforeUnmount(limpiarTemporal);
                                 <td><span :class="producto.estado ? 'activo' : 'inactivo'">{{ producto.estado ? 'ACTIVO' : 'INACTIVO' }}</span></td>
                                 <td>
                                     <div class="acciones">
-                                        <button type="button" class="btn-editar" title="Editar" @click="editar(producto)"><Pencil :size="16" /></button>
-                                        <button type="button" class="btn-estado" title="Cambiar estado" @click="cambiarEstado(producto)"><Power :size="16" /></button>
+                                        <button type="button" class="btn-editar" v-if="can('Producto.editar')" title="Editar" @click="editar(producto)"><Pencil :size="16" /></button>
+                                        <button type="button" class="btn-estado" v-if="can('Producto.actualizar')" title="Cambiar estado" @click="cambiarEstado(producto)"><Power :size="16" /></button>
                                     </div>
                                 </td>
                             </tr>
