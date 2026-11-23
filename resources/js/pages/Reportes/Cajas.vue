@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router } from '@inertiajs/vue3';
+const { can } = usePermissions();
 import { reactive } from 'vue';
 import { Search, FileText, FileSpreadsheet } from 'lucide-vue-next';
 
@@ -32,7 +34,7 @@ function imprimir(){window.print();}
   <div class="campo"><label>ESTADO DE CAJA:</label><select v-model="form.estado"><option value="TODOS">TODOS</option><option value="ABIERTO">ABIERTA</option><option value="CERRADO">CERRADA</option></select></div>
   <div class="campo"><label>ACCIONES:</label><button type="submit" class="aplicar"><Search :size="13"/> APLICAR FILTROS</button></div>
 </form>
-<div class="herramientas"><button class="pdf" type="button" @click="imprimir"><FileText :size="13"/> PDF Cajas / Imprimir</button><button class="excel" type="button" @click="exportar"><FileSpreadsheet :size="13"/> Exportar CSV</button></div>
+<div class="herramientas"><button class="pdf" type="button" @click="imprimir"><FileText :size="13"/> PDF Cajas / Imprimir</button><button class="excel" v-if="can('Reportes.exportar')" type="button" @click="exportar"><FileSpreadsheet :size="13"/> Exportar CSV</button></div>
 <div class="tabla"><table><thead><tr><th>⚙</th><th>CÓD.</th><th>USUARIO</th><th>F.APERTURA</th><th>F.CIERRE</th><th>S.INICIAL</th><th>T.VENTAS</th><th class="ingreso">INGRESOS</th><th class="egreso">EGRESOS</th><th>S.CAJA</th><th>ESTADO</th><th>PAGO QR</th></tr></thead>
 <tbody>
 <tr v-for="c in cajas.data" :key="c.id"><td>●</td><td>{{c.id}}</td><td>{{c.usuario}}</td><td>{{fecha(c.fecha_apertura)}}</td><td>{{fecha(c.fecha_cierre)}}</td><td class="num">{{dinero(c.monto_inicial)}}</td><td class="num">{{dinero(c.total_ventas)}}</td><td class="num verde">{{dinero(c.ingresos)}}</td><td class="num rojo">{{dinero(c.egresos)}}</td><td class="num">{{dinero(c.saldo)}}</td><td><span class="estado" :class="{abierta:c.estado==='ABIERTO'}">{{c.estado==='ABIERTO'?'ABIERTA':'CERRADA'}}</span></td><td class="num">{{dinero(c.pago_qr)}}</td></tr>
