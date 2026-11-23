@@ -18,6 +18,10 @@ class RolePermissions
 
     public static function allows(array $permissions, string $key): bool
     {
+        // Solo el administrador gestiona cuentas y roles, para impedir escalada de privilegios.
+        if (str_starts_with($key, 'Usuarios.') || str_starts_with($key, 'Roles.')) {
+            return $permissions['admin'];
+        }
         return $permissions['admin'] || in_array($key, $permissions['granted'], true);
     }
 
