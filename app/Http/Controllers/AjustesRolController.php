@@ -12,8 +12,9 @@ class AjustesRolController extends Controller
 {
     public const MODULOS = [
         'Dashboard'=>['ver'],
-        'Catálogos'=>['listar','crear','editar','eliminar'],
-        'Producto'=>['listar','crear','editar','detalle','eliminar'],
+        'Catálogos'=>['listar','crear','editar'],
+        'Unidad'=>['listar','crear','editar'],
+        'Producto'=>['listar','crear','editar','detalle','actualizar'],
         'Caja'=>['listar','crear','cerrar','detalle'],
         'Compra'=>['listar','crear','detalle','recibir'],
         'Proveedor'=>['listar','crear','editar','detalle','pagos'],
@@ -24,6 +25,20 @@ class AjustesRolController extends Controller
         'Usuarios'=>['listar','crear','editar'],
         'Roles'=>['listar','crear','editar','asignar_permisos'],
     ];
+    // Acciones visibles en la captura original pero todavía sin una operación
+    // equivalente implementada en SistemaSnackVue. Se muestran deshabilitadas:
+    // no se guardan como permisos ni conceden acceso a operaciones inexistentes.
+    public const PENDIENTES = [
+        'Dashboard'=>['ProductosStockCero','ProductosStockMin','Productos+Vendidos'],
+        'Laboratorio'=>['Listar','Crear','Editar','Detalle','Eliminar'],
+        'Unidad'=>['Eliminar'],
+        'Producto'=>['Eliminar','VerImagen'],
+        'Caja'=>['Eliminar','DescargarPDF'],
+        'Compra'=>['DescargarPDF','DetalleRecepcion','Anular','NuevaSolicitud'],
+        'Proveedor'=>['Eliminar'],
+        'Venta'=>['Anular','DescargarPDF','Descuentos','M.Pagos','EditarPrecio'],
+    ];
+
     private function admin(Request $request): void
     {
         if (!DB::table('users')->join('roles','roles.id','=','users.rol_id')
@@ -36,6 +51,7 @@ class AjustesRolController extends Controller
         return Inertia::render('Ajustes/Roles',[
             'roles'=>DB::table('roles')->orderBy('id')->paginate(10)->withQueryString(),
             'modulos'=>self::MODULOS,
+            'pendientes'=>self::PENDIENTES,
             'usuariosPorRol'=>DB::table('users')->whereNotNull('rol_id')
                 ->select('rol_id',DB::raw('COUNT(*) as total'))->groupBy('rol_id')->pluck('total','rol_id'),
         ]);
