@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { Plus, Save, X, Search, Trash2 } from 'lucide-vue-next';
@@ -9,6 +10,7 @@ type Producto = { id: number; nombre: string; codigo: string; stock_actual: numb
 type Recepcion = { id: number; codigo: string; recibo_factura: string | null; fecha: string; total: number | string; estado: string; proveedor: string; solicitado_por: string | null; sucursal: string };
 type Pagina = { data: Recepcion[]; total: number; current_page: number; last_page: number };
 const props = defineProps<{ recepciones: Pagina; proveedores: Proveedor[]; productos: Producto[]; filtros: Record<string, string | number | null>; siguienteFactura: string }>();
+const { can } = usePermissions();
 const modal = ref(false);
 const buscadorProducto = ref('');
 const filtros = ref({
@@ -73,7 +75,7 @@ function guardar() {
                 <h1>Administrar Órdenes de Compras <span class="contador">{{ recepciones.total }}</span></h1>
                 <div class="encabezado-acciones">
                     <button class="borde" type="button" disabled title="Solicitud de compra pendiente de implementar"><Plus :size="15"/> NUEVA SOLICITUD OC (PRÓXIMAMENTE)</button>
-                    <button class="borde verde" type="button" @click="nueva"><Plus :size="15"/> ORDEN DE COMPRA</button>
+                    <button class="borde verde" v-if="can('Compra.recibir')" type="button" @click="nueva"><Plus :size="15"/> ORDEN DE COMPRA</button>
                 </div>
             </header>
             <form class="filtros" @submit.prevent="buscar">
