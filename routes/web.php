@@ -21,6 +21,7 @@ use App\Http\Controllers\ReporteStockController;
 use App\Http\Controllers\InformeMensualController;
 use App\Http\Controllers\AjustesUsuarioController;
 use App\Http\Controllers\AjustesRolController;
+use App\Http\Controllers\DashboardController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -43,9 +44,7 @@ Route::middleware(['auth', 'verified', 'module.permission'])->group(function () 
     Route::delete('/ajustes/roles/{rol}', [AjustesRolController::class, 'destroy'])->name('ajustes.roles.destroy');
 
     // PANEL PRINCIPAL
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // GRUPOS DE PRODUCTOS
     Route::get('/catalogos/grupos', [GrupoProductoController::class, 'index'])
