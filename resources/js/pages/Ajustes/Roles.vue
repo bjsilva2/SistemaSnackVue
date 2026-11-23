@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { Plus, MoreVertical, Search, X, ShieldCheck } from 'lucide-vue-next';
 type Rol={id:number;nombre:string;permisos:string[]|string;created_at:string;updated_at:string};
 type Pagina={data:Rol[];total:number;current_page:number;last_page:number};
 const props=defineProps<{roles:Pagina;modulos:Record<string,string[]>;pendientes:Record<string,string[]>;usuariosPorRol:Record<string,number>}>();
+const { can } = usePermissions();
 const buscar=ref('');
 const modal=ref(false);const permisosModal=ref(false);
 const editando=ref<number|null>(null);const actual=ref<Rol|null>(null);
@@ -29,11 +31,11 @@ function pagina(n:number){router.get('/ajustes/roles',{page:n},{preserveState:tr
 <template>
 <Head title="Administrar Roles"/><AppLayout><main class="pagina" translate="no">
 <div class="miga">CONFIGURACIONES › <b>ROLES</b></div>
-<div class="panel"><header><h1>Administrar Roles <span class="contador">{{roles.total}}</span></h1><button class="nuevo" @click="editar()"><Plus :size="14"/> NUEVO</button></header>
+<div class="panel"><header><h1>Administrar Roles <span class="contador">{{roles.total}}</span></h1><button class="nuevo" v-if="can('Roles.crear')" @click="editar()"><Plus :size="14"/> NUEVO</button></header>
 <div class="busqueda"><Search :size="13"/><input v-model="buscar" placeholder="Buscar..."/></div>
 <div class="tabla"><table><thead><tr><th>CÓDIGO ⇅</th><th>NOMBRE ROL</th><th>FECHA CREACIÓN</th><th>ÚLTIMA MODIFICACIÓN</th><th>ACCIONES</th></tr></thead><tbody>
 <tr v-for="r in filtrados" :key="r.id"><td>{{r.id}}</td><td>{{r.nombre}}</td><td>{{fecha(r.created_at)}}</td><td>{{fecha(r.updated_at)}}</td><td><div class="accion-wrap"><button class="opciones" @click="menu=menu===r.id?null:r.id"><MoreVertical :size="15"/></button>
-<div v-if="menu===r.id" class="desplegable"><button @click="editar(r)">Editar</button><button @click="editarPermisos(r)" :disabled="r.nombre==='Administrador'">Editar Permisos de Rol</button><button @click="borrar(r)" :disabled="r.nombre==='Administrador'||Number(usuariosPorRol[String(r.id)]||0)>0">Eliminar</button></div></div></td></tr>
+<div v-if="menu===r.id" class="desplegable"><button v-if="can('Roles.editar')" @click="editar(r)">Editar</button><button v-if="can('Roles.asignar_permisos')" @click="editarPermisos(r)" :disabled="r.nombre==='Administrador'">Editar Permisos de Rol</button><button v-if="can('Roles.eliminar')" @click="borrar(r)" :disabled="r.nombre==='Administrador'||Number(usuariosPorRol[String(r.id)]||0)>0">Eliminar</button></div></div></td></tr>
 <tr v-if="!filtrados.length"><td colspan="5" class="vacio">No hay roles coincidentes.</td></tr>
 </tbody></table></div>
 <footer class="pie"><span>Mostrando {{filtrados.length}} de {{roles.total}} roles</span><div><button :disabled="roles.current_page<=1" @click="pagina(roles.current_page-1)">‹</button><span>{{roles.current_page}}</span><button :disabled="roles.current_page>=roles.last_page" @click="pagina(roles.current_page+1)">›</button></div></footer></div>
