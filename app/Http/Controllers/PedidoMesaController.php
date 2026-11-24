@@ -63,6 +63,78 @@ class PedidoMesaController extends Controller {
   });
   return back()->with('success','Pedido registrado. Puedes cobrarlo cuando tengas una caja abierta.');
  }
+ public function registrarYCobrar(Request $request) {
+  // Cobro directo exclusivo de PARA LLEVAR. MESA mantiene el cobro posterior.
+  $d=$request->validate([
+   'modalidad'=>['required',Rule::in(['LLEVAR'])],
+   'cliente_id'=>['nullable','integer',Rule::exists('clientes','id')->where('estado',true)],
+   'nombre_cliente'=>['nullable','string','max:160'],
+   'nota_cocina'=>['nullable','string','max:1000'],
+   'metodo_pago'=>['required',Rule::in(['EFECTIVO','QR'])],
+   'items'=>['required','array','min:1'],
+   'items.*.producto_id'=>['required','integer','distinct',
+    Rule::exists('productos','id')->where('estado',true)->where('tipo','PRODUCTO')],
+   'items.*.cantidad'=>['required','numeric','gt:0','decimal:0,2'],
+  ]);
+  DB::transaction(function() use ($d,$request) {
+   // El cierre de caja y el cobro compiten por el mismo bloqueo.
+   $caja=DB::table('cajas')->where('usuario_id',$request->user()->id)
+    ->where('estado','ABIERTO')->lockForUpdate()->first();
+   if(!$caja)throw ValidationException::withMessages([
+    'caja'=>'Debes tener una caja abierta para cobrar directamente.',
+   ]);
+   $productos=Producto::whereIn('id',collect($d['items'])->pluck('producto_id'))
+    ->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+   $totalCentavos=0;
+   $detalle=[];
+   foreach($d['items'] as $item) {
+    $producto=$productos->get($item['producto_id']);
+    if(!$producto||!$producto->estado||$producto->tipo!=='PRODUCTO')
+     throw ValidationException::withMessages(['items'=>'Producto no disponible.']);
+    $cantidadCent=(int) round((float)$item['cantidad']*100);
+    $existenciasCent=(int) round((float)$producto->stock_actual*100);
+    if($existenciasCent<$cantidadCent)
+     throw ValidationException::withMessages(['stock'=>'Stock insuficiente para '.$producto->nombre.'.']);
+    $precioCent=(int) round((float)$producto->precio_venta*100);
+    $subtotalCent=(int) round($cantidadCent*$precioCent/100);
+    $totalCentavos+=$subtotalCent;
+    $detalle[]=[$producto,$cantidadCent,$precioCent,$subtotalCent];
+   }
+   $pedidoId=(int)DB::selectOne("SELECT nextval(pg_get_serial_sequence('pedidos','id')) AS numero")->numero;
+   $ahora=now();
+   DB::table('pedidos')->insert([
+    'id'=>$pedidoId,
+    'codigo'=>'PED-'.str_pad((string)$pedidoId,4,'0',STR_PAD_LEFT),
+    'modalidad'=>'LLEVAR','mesa_id'=>null,
+    'cliente_id'=>$d['cliente_id']??null,'usuario_id'=>$request->user()->id,
+    'caja_id'=>$caja->id,'nombre_cliente'=>$d['nombre_cliente']??null,
+    'nota_cocina'=>$d['nota_cocina']??null,
+    'estado'=>'COBRADO','metodo_pago'=>$d['metodo_pago'],
+    'total'=>number_format($totalCentavos/100,2,'.',''),
+    'cobrado_at'=>$ahora,'created_at'=>$ahora,'updated_at'=>$ahora,
+   ]);
+   foreach($detalle as [$producto,$cantidadCent,$precioCent,$subtotalCent]) {
+    DB::table('pedido_items')->insert([
+     'pedido_id'=>$pedidoId,'producto_id'=>$producto->id,
+     'cantidad'=>number_format($cantidadCent/100,2,'.',''),
+     'precio_unitario'=>number_format($precioCent/100,2,'.',''),
+     'subtotal'=>number_format($subtotalCent/100,2,'.',''),
+     'created_at'=>$ahora,'updated_at'=>$ahora,
+    ]);
+    $producto->stock_actual=number_format(
+     ((int)round((float)$producto->stock_actual*100)-$cantidadCent)/100,2,'.',''
+    );
+    $producto->save();
+   }
+   $total=number_format($totalCentavos/100,2,'.','');
+   DB::table('cajas')->where('id',$caja->id)->update([
+    'total_ventas'=>DB::raw('total_ventas + '.$total),
+    'saldo'=>DB::raw('saldo + '.$total),
+    'updated_at'=>$ahora,
+   ]);
+  });
+  return back()->with('success','Pedido para llevar registrado y cobrado correctamente.');
+ }
  public function cobrar(Request $request,int $pedido) {
   $d=$request->validate(['metodo_pago'=>['required',Rule::in(['EFECTIVO','QR'])]]);
   DB::transaction(function()use($request,$pedido,$d){
