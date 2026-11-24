@@ -129,6 +129,7 @@ Route::middleware(['auth', 'verified', 'module.permission'])->group(function () 
     // PEDIDOS DE MESA / PARA LLEVAR / YANGO
     Route::get('/ventas/pedidos', [PedidoMesaController::class, 'index'])->name('pedidos.index');
     Route::post('/ventas/pedidos', [PedidoMesaController::class, 'store'])->name('pedidos.store');
+    Route::post('/ventas/pedidos/cobrar-directo', [PedidoMesaController::class, 'registrarYCobrar'])->name('pedidos.cobrar-directo');
     Route::post('/ventas/pedidos/{pedido}/cobrar', [PedidoMesaController::class, 'cobrar'])->name('pedidos.cobrar');
     Route::patch('/ventas/mesas/{mesa}/liberar', [PedidoMesaController::class, 'liberarMesa'])->name('mesas.liberar');
 
