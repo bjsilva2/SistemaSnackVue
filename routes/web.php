@@ -21,6 +21,7 @@ use App\Http\Controllers\ReporteStockController;
 use App\Http\Controllers\InformeMensualController;
 use App\Http\Controllers\AjustesUsuarioController;
 use App\Http\Controllers\AjustesRolController;
+use App\Http\Controllers\ListadoVentasController;
 use App\Http\Controllers\DashboardController;
 
 // Página de bienvenida
@@ -121,6 +122,9 @@ Route::middleware(['auth', 'verified', 'module.permission'])->group(function () 
 
     // INFORME MENSUAL Y GESTIÓN
     Route::get('/reportes/mensual', [InformeMensualController::class, 'index'])->name('reportes.mensual');
+
+    // LISTADO DE VENTAS (CONSULTA)
+    Route::get('/ventas/listado', [ListadoVentasController::class, 'index'])->name('ventas.listado');
 
     // PEDIDOS DE MESA / PARA LLEVAR / YANGO
     Route::get('/ventas/pedidos', [PedidoMesaController::class, 'index'])->name('pedidos.index');
