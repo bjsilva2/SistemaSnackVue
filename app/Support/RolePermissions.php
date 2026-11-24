@@ -82,6 +82,7 @@ class RolePermissions
         'clientes.store'=>'Clientes.crear',
         'clientes.update'=>'Clientes.editar',
         'clientes.estado'=>'Clientes.editar',
+        'ventas.listado'=>'Venta.listar',
         'pedidos.index'=>'Venta.listar',
         'pedidos.store'=>'Venta.crear',
         'pedidos.cobrar'=>'Venta.cobrar',
