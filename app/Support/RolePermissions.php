@@ -85,6 +85,7 @@ class RolePermissions
         'ventas.listado'=>'Venta.listar',
         'pedidos.index'=>'Venta.listar',
         'pedidos.store'=>'Venta.crear',
+        'pedidos.cobrar-directo'=>'Venta.cobrar',
         'pedidos.cobrar'=>'Venta.cobrar',
         'mesas.liberar'=>'Venta.detalle',
         'cocina.index'=>'Cocina.listar',
