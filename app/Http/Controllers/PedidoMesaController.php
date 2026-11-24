@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use App\Support\RolePermissions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -64,6 +65,7 @@ class PedidoMesaController extends Controller {
   return back()->with('success','Pedido registrado. Puedes cobrarlo cuando tengas una caja abierta.');
  }
  public function registrarYCobrar(Request $request) {
+  abort_unless(RolePermissions::allows(RolePermissions::forUser($request->user()), 'Venta.crear'),403,'Sin permiso para registrar pedidos.');
   // Cobro directo exclusivo de PARA LLEVAR. MESA mantiene el cobro posterior.
   $d=$request->validate([
    'modalidad'=>['required',Rule::in(['LLEVAR'])],
