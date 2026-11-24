@@ -41,8 +41,8 @@ function limpiar(m:Mesa){if(confirm('¿Marcar la mesa '+m.numero+' como libre?')
 <main class="pagina">
  <template v-if="vista==='plano'">
   <header class="titulo">
-   <div><h1>Plano Visual de Mesas</h1><div class="leyenda"><span class="libre">● Libres</span> · <span class="ocupada">● Ocupadas</span> · <span class="limpiar">● Para llevar a limpiar</span> · <span class="yango">● Yango</span></div></div>
-   <div class="acciones"><button class="amarillo" type="button" title="Edición del layout pendiente" disabled>Editar Layout</button><button class="actualizar" type="button" @click="router.reload()"><RefreshCw :size="15"/></button><button class="lista" v-if="can('Venta.crear')" type="button" @click="crear('LLEVAR')"><ShoppingBag :size="14"/> Para Llevar</button><button class="yango-boton" v-if="can('Venta.crear')" type="button" @click="crear('YANGO')"><Car :size="14"/> Yango</button></div>
+   <div><h1>Plano Visual de Mesas</h1><div class="leyenda"><span class="libre">● Libres</span> · <span class="ocupada">● Ocupadas</span> · <span class="limpiar">● Para llevar a limpiar</span></div></div>
+   <div class="acciones"><button class="actualizar" type="button" title="Actualizar mesas y pedidos" @click="router.reload()"><RefreshCw :size="15"/></button><button class="lista" v-if="can('Venta.crear')" type="button" @click="crear('LLEVAR')"><ShoppingBag :size="14"/> Para Llevar</button></div>
   </header>
   <div class="plano"><div class="piso">PISO 1</div><div class="mesas">
    <button v-for="m in mesas" :key="m.id" type="button" class="mesa" :disabled="(m.estado==='LIBRE'&&!can('Venta.crear'))||(m.estado==='POR_LIMPIAR'&&!can('Venta.detalle'))" :class="{ocupada:m.estado==='OCUPADA',sucia:m.estado==='POR_LIMPIAR'}" @click="m.estado==='LIBRE'?crear('MESA',m):m.estado==='POR_LIMPIAR'?limpiar(m):undefined"><span>{{m.numero}}</span><small><UtensilsCrossed :size="11"/> {{m.capacidad}}p</small><em v-if="m.estado==='OCUPADA'">OCUPADA</em><em v-if="m.estado==='POR_LIMPIAR'">POR LIMPIAR</em></button>
