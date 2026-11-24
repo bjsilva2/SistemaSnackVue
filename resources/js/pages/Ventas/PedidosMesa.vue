@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import { Plus, ArrowLeft, RefreshCw, UtensilsCrossed, ShoppingBag, Car, Search, CreditCard } from 'lucide-vue-next';
+import { Plus, ArrowLeft, RefreshCw, UtensilsCrossed, ShoppingBag, Search, CreditCard } from 'lucide-vue-next';
 
 type Mesa={id:number;numero:number;capacidad:number;piso:string;estado:string};
 type Producto={id:number;codigo:string;nombre:string;precio_venta:string|number;stock_actual:string|number;grupo_id:number|null;imagen_url:string|null};
@@ -13,19 +13,19 @@ type PedidoPendiente={id:number;codigo:string;modalidad:string;mesa_id:number|nu
 const props=defineProps<{mesas:Mesa[];productos:Producto[];grupos:Grupo[];clientes:Cliente[];cajaAbierta:boolean;pedidosPendientes:PedidoPendiente[]}>();
 const { can } = usePermissions();
 const vista=ref<'plano'|'pedido'>('plano');
-const tipo=ref<'MESA'|'LLEVAR'|'YANGO'>('MESA');
+const tipo=ref<'MESA'|'LLEVAR'>('MESA');
 const filtro=ref('');
 const grupo=ref<number|null>(null);
 const mesaElegida=ref<Mesa|null>(null);
 const metodoCobro=ref<'EFECTIVO'|'QR'>('EFECTIVO');
 const cobrando=ref<number|null>(null);
 type Item={producto_id:number;cantidad:number};
-const form=useForm({modalidad:'MESA' as 'MESA'|'LLEVAR'|'YANGO',mesa_id:null as number|null,cliente_id:null as number|null,nombre_cliente:'',nota_cocina:'',items:[] as Item[]});
+const form=useForm({modalidad:'MESA' as 'MESA'|'LLEVAR',mesa_id:null as number|null,cliente_id:null as number|null,nombre_cliente:'',nota_cocina:'',items:[] as Item[]});
 const encontrados=computed(()=>props.productos.filter(p=>(!grupo.value||p.grupo_id===grupo.value)&&(!filtro.value||(p.nombre+' '+p.codigo).toLowerCase().includes(filtro.value.toLowerCase()))));
 const moneda=(n:number|string)=>Number(n).toLocaleString('es-BO',{minimumFractionDigits:2,maximumFractionDigits:2});
 const itemsVista=computed(()=>form.items.map(i=>({ ...i,producto:props.productos.find(p=>p.id===i.producto_id)})));
 const total=computed(()=>itemsVista.value.reduce((s,i)=>s+(i.producto?Number(i.producto.precio_venta)*i.cantidad:0),0));
-function crear(modalidad:'MESA'|'LLEVAR'|'YANGO',mesa:Mesa|null=null){
+function crear(modalidad:'MESA'|'LLEVAR',mesa:Mesa|null=null){
  form.reset();form.clearErrors();tipo.value=modalidad;mesaElegida.value=mesa;form.modalidad=modalidad;form.mesa_id=mesa?.id??null;vista.value='pedido';
 }
 function agregar(p:Producto){const i=form.items.find(i=>i.producto_id===p.id);if(i)i.cantidad++;else form.items.push({producto_id:p.id,cantidad:1});}
@@ -57,11 +57,11 @@ function limpiar(m:Mesa){if(confirm('¿Marcar la mesa '+m.numero+' como libre?')
  <template v-else>
   <div class="pedido-grid">
    <section class="catalogo">
-    <div class="busqueda"><Search :size="15"/><input v-model="filtro" placeholder="Buscar platillo o código..."/><button type="button" :class="{sel:tipo==='MESA'}" @click="crear('MESA')"><UtensilsCrossed :size="13"/> MESA</button><button type="button" :class="{sel:tipo==='LLEVAR'}" @click="crear('LLEVAR')"><ShoppingBag :size="13"/> LLEVAR</button><button type="button" :class="{sel:tipo==='YANGO'}" @click="crear('YANGO')"><Car :size="13"/> YANGO</button></div>
+    <div class="busqueda"><Search :size="15"/><input v-model="filtro" placeholder="Buscar platillo o código..."/><button type="button" :class="{sel:tipo==='MESA'}" @click="crear('MESA')"><UtensilsCrossed :size="13"/> MESA</button><button type="button" :class="{sel:tipo==='LLEVAR'}" @click="crear('LLEVAR')"><ShoppingBag :size="13"/> LLEVAR</button></div>
     <div class="grupos"><button :class="{activo:grupo===null}" @click="grupo=null">🔥 Todas</button><button v-for="g in grupos" :key="g.id" :class="{activo:grupo===g.id}" @click="grupo=g.id">{{g.nombre}}</button></div>
     <div class="productos"><div v-for="p in encontrados" :key="p.id" class="producto"><div class="foto"><img v-if="p.imagen_url" :src="p.imagen_url" :alt="p.nombre"/><UtensilsCrossed v-else :size="38" color="#94a3b8"/></div><strong>{{p.nombre}}</strong><div class="precio">Bs. <b>{{moneda(p.precio_venta)}}</b><button type="button" aria-label="Agregar producto" @click="agregar(p)"><Plus :size="18"/></button></div></div><p v-if="!encontrados.length" class="sin-productos">No hay productos para mostrar.</p></div>
    </section>
-   <section class="resumen"><div class="encabezado-resumen"><button type="button" @click="vista='plano'"><ArrowLeft :size="21"/></button><strong>{{tipo==='MESA'?'MESA '+(mesaElegida?.numero??''):tipo==='LLEVAR'?'PARA LLEVAR':'YANGO'}} - NUEVO</strong></div>
+   <section class="resumen"><div class="encabezado-resumen"><button type="button" @click="vista='plano'"><ArrowLeft :size="21"/></button><strong>{{tipo==='MESA'?'MESA '+(mesaElegida?.numero??''):'PARA LLEVAR'}} - NUEVO</strong></div>
     <div class="cliente"><select v-model="form.cliente_id"><option :value="null">Seleccionar cliente (opcional)</option><option v-for="c in clientes" :key="c.id" :value="c.id">{{c.nombre_completo}}</option></select><input v-model="form.nombre_cliente" placeholder="Nombre del cliente"/></div>
     <div class="cabecera-items"><span>PRODUCTO</span><span>CANT.</span><span>TOTAL</span></div>
     <div class="items"><div v-for="i in itemsVista" :key="i.producto_id" class="linea"><div><strong>{{i.producto?.nombre}}</strong><button class="quitar" type="button" @click="quitar(i.producto_id)">Quitar</button></div><input  :value="i.cantidad" @change="actualizarCantidad(i.producto_id, $event)" type="number" min="0.01" step="0.01"/><b>{{moneda((Number(i.producto?.precio_venta)||0)*i.cantidad)}}</b></div><p v-if="!itemsVista.length" class="sin-items">Sin productos</p></div>
