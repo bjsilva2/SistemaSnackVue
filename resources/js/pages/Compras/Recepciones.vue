@@ -74,7 +74,6 @@ function guardar() {
             <header class="encabezado">
                 <h1>Administrar Órdenes de Compras <span class="contador">{{ recepciones.total }}</span></h1>
                 <div class="encabezado-acciones">
-                    <button class="borde" type="button" disabled title="Solicitud de compra pendiente de implementar"><Plus :size="15"/> NUEVA SOLICITUD OC (PRÓXIMAMENTE)</button>
                     <button class="borde verde" v-if="can('Compra.recibir')" type="button" @click="nueva"><Plus :size="15"/> ORDEN DE COMPRA</button>
                 </div>
             </header>
