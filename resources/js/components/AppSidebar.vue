@@ -132,7 +132,7 @@ function alternar(titulo: string) {
     <Sidebar collapsible="icon" variant="inset" class="sidebar-snack">
         <SidebarHeader class="cabecera">
             <Link href="/dashboard" class="marca">
-                <img class="logo" src="/logo-sistema.svg" alt="Logo SistemaSnack" />
+                <img class="logo" src="/logo-sistema-vector.svg" alt="Logo SistemaSnack" />
                 <div class="nombre-marca">
                     <strong>SistemaSnack</strong>
                     <span>Sistema de ventas</span>
