@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { RefreshCw, LockKeyholeOpen, MoreVertical, Search, X } from 'lucide-vue-next';
 type Caja={id:number;usuario:string;sucursal:string;monto_inicial:string|number;ingresos:string|number;egresos:string|number;total_ventas:string|number;saldo:string|number;fecha_apertura:string;fecha_cierre:string|null;estado:string};
 type Pagina={data:Caja[];current_page:number;last_page:number;total:number};
 const props=defineProps<{cajas:Pagina;filtros:{buscar:string};cajaAbierta:boolean}>();
+const { can } = usePermissions();
 const buscar=ref(props.filtros.buscar||'');
 const modal=ref(false);
 const form=useForm({sucursal:'Sistema Snack',monto_inicial:0});
@@ -22,12 +24,12 @@ function cerrar(c:Caja){if(confirm('¿Confirmas el cierre de la caja #'+c.id+'?'
 <main class="pagina">
 <div class="miga">Cajas &gt; <strong>Listado de Cajas</strong></div>
 <section class="panel">
-<header class="encabezado"><h1>Administrar Cajas <span class="contador">{{cajas.total}}</span></h1><div class="botones-superiores"><button type="button" class="actualizar" title="Actualizar listado" @click="router.reload()"><RefreshCw :size="15"/></button><button type="button" class="apertura" :disabled="cajaAbierta" @click="abrir"><LockKeyholeOpen :size="15"/> APERTURAR CAJA</button></div></header>
+<header class="encabezado"><h1>Administrar Cajas <span class="contador">{{cajas.total}}</span></h1><div class="botones-superiores"><button type="button" class="actualizar" title="Actualizar listado" @click="router.reload()"><RefreshCw :size="15"/></button><button type="button" class="apertura" v-if="can('Caja.crear')" :disabled="cajaAbierta" @click="abrir"><LockKeyholeOpen :size="15"/> APERTURAR CAJA</button></div></header>
 <div class="barra"><form @submit.prevent="filtrar" class="buscador"><Search :size="13"/><input v-model="buscar" placeholder="Buscar Cajas"/><button type="submit">Buscar</button></form></div>
 <div class="tabla"><table>
 <thead><tr><th>CÓD. ⇅</th><th>USUARIO</th><th>S.INICIAL</th><th>INGRESOS</th><th>EGRESOS</th><th>T.VENTAS</th><th>SALDO</th><th>F.APERTURA</th><th>F.CIERRE</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
 <tbody>
-<tr v-for="c in cajas.data" :key="c.id"><td>{{c.id}}</td><td>{{c.usuario}}</td><td class="num">{{formato(c.monto_inicial)}}</td><td class="num"><b>{{formato(c.ingresos)}}</b></td><td class="num egreso"><b>{{formato(c.egresos)}}</b></td><td class="num"><b>{{formato(c.total_ventas)}}</b></td><td class="num">{{formato(c.saldo)}}</td><td>{{c.fecha_apertura}}</td><td>{{c.fecha_cierre||'—'}}</td><td><span class="estado" :class="{abierto:c.estado==='ABIERTO'}">{{c.estado}}</span></td><td><button type="button" class="acciones" :disabled="c.estado!=='ABIERTO'" :title="c.estado==='ABIERTO'?'Cerrar caja':'Caja cerrada'" @click="cerrar(c)"><MoreVertical :size="15"/></button></td></tr>
+<tr v-for="c in cajas.data" :key="c.id"><td>{{c.id}}</td><td>{{c.usuario}}</td><td class="num">{{formato(c.monto_inicial)}}</td><td class="num"><b>{{formato(c.ingresos)}}</b></td><td class="num egreso"><b>{{formato(c.egresos)}}</b></td><td class="num"><b>{{formato(c.total_ventas)}}</b></td><td class="num">{{formato(c.saldo)}}</td><td>{{c.fecha_apertura}}</td><td>{{c.fecha_cierre||'—'}}</td><td><span class="estado" :class="{abierto:c.estado==='ABIERTO'}">{{c.estado}}</span></td><td><button type="button" class="acciones" v-if="can('Caja.cerrar')" :disabled="c.estado!=='ABIERTO'" :title="c.estado==='ABIERTO'?'Cerrar caja':'Caja cerrada'" @click="cerrar(c)"><MoreVertical :size="15"/></button></td></tr>
 <tr v-if="!cajas.data.length"><td colspan="11" class="vacio">No se registraron cajas todavía.</td></tr>
 </tbody></table></div>
 <div class="pie"><span>Registros: {{cajas.total}}</span><div><button :disabled="cajas.current_page<=1" @click="pagina(cajas.current_page-1)">Anterior</button><span>{{cajas.current_page}} / {{cajas.last_page}}</span><button :disabled="cajas.current_page>=cajas.last_page" @click="pagina(cajas.current_page+1)">Siguiente</button></div></div>

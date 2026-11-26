@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router } from '@inertiajs/vue3';
+const { can } = usePermissions();
 import { reactive, computed } from 'vue';
 function imprimir(){window.print();}
 import { Search, FileText, FileSpreadsheet } from 'lucide-vue-next';
@@ -42,8 +44,8 @@ const hay=computed(()=>props.compras.data.length>0);
 </section>
 <p class="nota">Los totales corresponden a las compras del filtro. Si filtras un producto, se incluyen los totales de las compras que lo contienen; la tabla muestra solo las líneas del producto seleccionado.</p>
 <div class="herramientas">
-  <button type="button" class="pdf" @click="imprimir"><FileText :size="13"/> Imprimir / PDF</button>
-  <button type="button" class="excel" @click="csv"><FileSpreadsheet :size="13"/> Exportar CSV</button>
+  <button type="button" class="pdf" v-if="can('Reportes.exportar')" @click="imprimir"><FileText :size="13"/> Imprimir / PDF</button>
+  <button type="button" class="excel" v-if="can('Reportes.exportar')" @click="csv"><FileSpreadsheet :size="13"/> Exportar CSV</button>
 </div>
 <div class="tabla">
 <table>

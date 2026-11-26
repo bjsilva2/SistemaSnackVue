@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Plus, Search, MoreVertical, X, Save } from 'lucide-vue-next';
 type Cliente={id:number;codigo:string;nombre_completo:string;ci_nit:string|null;telefono:string|null;domicilio:string|null;tipo_cliente:string;estado:boolean};
 type Pagina={data:Cliente[];total:number;current_page:number;last_page:number};
 const props=defineProps<{clientes:Pagina;filtros:{buscar:string};siguienteCodigo:string}>();
+const { can } = usePermissions();
 const buscar=ref(props.filtros.buscar||'');
 const modal=ref(false);
 const editando=ref<number|null>(null);
@@ -23,14 +25,14 @@ function pagina(n:number){router.get('/ventas/clientes',{buscar:buscar.value,pag
 <main class="pagina">
 <div class="ruta">Ventas &gt; <strong>Clientes</strong></div>
 <section class="panel">
-<header class="cabecera"><h1>Administrar Clientes <span class="cantidad">{{clientes.total}}</span></h1><button class="nuevo" type="button" @click="nuevo"><Plus :size="16"/> Nuevo</button></header>
+<header class="cabecera"><h1>Administrar Clientes <span class="cantidad">{{clientes.total}}</span></h1><button class="nuevo" v-if="can('Clientes.crear')" type="button" @click="nuevo"><Plus :size="16"/> Nuevo</button></header>
 <div class="barra"><form class="buscador" @submit.prevent="filtrar"><Search :size="13"/><input v-model="buscar" placeholder="Buscar cliente..." aria-label="Buscar cliente"/><button type="submit">Buscar</button></form></div>
 <div class="tabla"><table>
 <thead><tr><th>#</th><th>CÓDIGO ⇅</th><th>NOMBRE COMPLETO</th><th>CI/NIT</th><th>TELÉFONO</th><th>DOMICILIO</th><th>T. CLIENTE</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
 <tbody>
 <tr v-for="(c,i) in clientes.data" :key="c.id">
 <td>{{(clientes.current_page-1)*10+i+1}}</td><td>{{c.codigo}}</td><td>{{c.nombre_completo}}</td><td>{{c.ci_nit||''}}</td><td>{{c.telefono||''}}</td><td>{{c.domicilio||''}}</td><td>{{c.tipo_cliente}}</td><td><span class="estado" :class="{inactivo:!c.estado}">{{c.estado?'ACTIVO':'INACTIVO'}}</span></td>
-<td class="acciones-td"><button class="acciones" type="button" title="Editar cliente" aria-label="Editar cliente" @click="editar(c)"><MoreVertical :size="16"/></button></td>
+<td class="acciones-td"><button class="acciones" v-if="can('Clientes.editar')" type="button" title="Editar cliente" aria-label="Editar cliente" @click="editar(c)"><MoreVertical :size="16"/></button></td>
 </tr>
 <tr v-if="!clientes.data.length"><td colspan="9" class="vacio">No se encontraron clientes registrados.</td></tr>
 </tbody>

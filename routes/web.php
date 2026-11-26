@@ -19,6 +19,10 @@ use App\Http\Controllers\ReporteComprasController;
 use App\Http\Controllers\ReporteCajasController;
 use App\Http\Controllers\ReporteStockController;
 use App\Http\Controllers\InformeMensualController;
+use App\Http\Controllers\AjustesUsuarioController;
+use App\Http\Controllers\AjustesRolController;
+use App\Http\Controllers\ListadoVentasController;
+use App\Http\Controllers\DashboardController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -26,12 +30,22 @@ Route::get('/', function () {
 })->name('home');
 
 // Rutas protegidas
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'module.permission'])->group(function () {
+
+    // ADMINISTRAR USUARIOS
+    Route::get('/ajustes/usuarios', [AjustesUsuarioController::class, 'index'])->name('ajustes.usuarios');
+    Route::post('/ajustes/usuarios', [AjustesUsuarioController::class, 'store'])->name('ajustes.usuarios.store');
+    Route::put('/ajustes/usuarios/{usuario}', [AjustesUsuarioController::class, 'update'])->name('ajustes.usuarios.update');
+
+    // ADMINISTRAR ROLES Y PERMISOS
+    Route::get('/ajustes/roles', [AjustesRolController::class, 'index'])->name('ajustes.roles');
+    Route::post('/ajustes/roles', [AjustesRolController::class, 'store'])->name('ajustes.roles.store');
+    Route::put('/ajustes/roles/{rol}', [AjustesRolController::class, 'update'])->name('ajustes.roles.update');
+    Route::put('/ajustes/roles/{rol}/permisos', [AjustesRolController::class, 'permisos'])->name('ajustes.roles.permisos');
+    Route::delete('/ajustes/roles/{rol}', [AjustesRolController::class, 'destroy'])->name('ajustes.roles.destroy');
 
     // PANEL PRINCIPAL
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // GRUPOS DE PRODUCTOS
     Route::get('/catalogos/grupos', [GrupoProductoController::class, 'index'])
@@ -109,9 +123,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // INFORME MENSUAL Y GESTIÓN
     Route::get('/reportes/mensual', [InformeMensualController::class, 'index'])->name('reportes.mensual');
 
+    // LISTADO DE VENTAS (CONSULTA)
+    Route::get('/ventas/listado', [ListadoVentasController::class, 'index'])->name('ventas.listado');
+
     // PEDIDOS DE MESA / PARA LLEVAR / YANGO
     Route::get('/ventas/pedidos', [PedidoMesaController::class, 'index'])->name('pedidos.index');
     Route::post('/ventas/pedidos', [PedidoMesaController::class, 'store'])->name('pedidos.store');
+    Route::post('/ventas/pedidos/cobrar-directo', [PedidoMesaController::class, 'registrarYCobrar'])->name('pedidos.cobrar-directo');
     Route::post('/ventas/pedidos/{pedido}/cobrar', [PedidoMesaController::class, 'cobrar'])->name('pedidos.cobrar');
     Route::patch('/ventas/mesas/{mesa}/liberar', [PedidoMesaController::class, 'liberarMesa'])->name('mesas.liberar');
 

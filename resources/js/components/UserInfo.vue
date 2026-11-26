@@ -31,8 +31,15 @@ const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '')
         </AvatarFallback>
     </Avatar>
 
-    <div class="grid flex-1 text-left text-sm leading-tight">
-        <span class="truncate font-medium">{{ user.name }}</span>
+    <div class="grid min-w-0 flex-1 text-left text-sm leading-tight">
+        <span class="nombre-usuario truncate font-semibold">{{ user.name }}</span>
         <span v-if="showEmail" class="truncate text-xs text-muted-foreground">{{ user.email }}</span>
     </div>
 </template>
+
+<style scoped>
+.nombre-usuario {
+    color: #263648 !important;
+    opacity: 1 !important;
+}
+</style>

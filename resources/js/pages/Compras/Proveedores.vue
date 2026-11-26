@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Plus, Search, Pencil, Power, X, Save, Truck } from 'lucide-vue-next';
@@ -21,6 +22,7 @@ type Proveedor = {
 type Pagina = { data: Proveedor[]; current_page: number; last_page: number; total: number };
 const props = defineProps<{ proveedores: Pagina; filtros: { buscar: string } }>();
 
+const { can } = usePermissions();
 const buscar = ref(props.filtros.buscar || '');
 const modal = ref(false);
 const editando = ref<number | null>(null);
@@ -104,7 +106,7 @@ function cambiarPagina(numero: number) {
                     <p class="ruta">Compras / Proveedores</p>
                     <h1>Administrar Proveedores <span class="contador">{{ proveedores.total }}</span></h1>
                 </div>
-                <button type="button" class="btn-azul" @click="nuevo"><Plus :size="17" /> Nuevo</button>
+                <button type="button" class="btn-azul" v-if="can('Proveedor.crear')" @click="nuevo"><Plus :size="17" /> Nuevo</button>
             </div>
             <div class="tarjeta">
                 <form class="buscador" @submit.prevent="buscarProveedores">
@@ -127,8 +129,8 @@ function cambiarPagina(numero: number) {
                                 <td>{{ proveedor.telefono || '—' }}</td>
                                 <td><span :class="proveedor.estado ? 'activo' : 'inactivo'">{{ proveedor.estado ? 'ACTIVO' : 'INACTIVO' }}</span></td>
                                 <td><div class="acciones">
-                                    <button type="button" class="btn-editar" title="Editar" @click="editar(proveedor)"><Pencil :size="16" /></button>
-                                    <button type="button" class="btn-estado" title="Cambiar estado" @click="cambiarEstado(proveedor)"><Power :size="16" /></button>
+                                    <button type="button" class="btn-editar" v-if="can('Proveedor.editar')" title="Editar" @click="editar(proveedor)"><Pencil :size="16" /></button>
+                                    <button type="button" class="btn-estado" v-if="can('Proveedor.editar')" title="Cambiar estado" @click="cambiarEstado(proveedor)"><Power :size="16" /></button>
                                 </div></td>
                             </tr>
                             <tr v-if="proveedores.data.length === 0"><td colspan="8" class="sin-datos">No existen proveedores registrados.</td></tr>

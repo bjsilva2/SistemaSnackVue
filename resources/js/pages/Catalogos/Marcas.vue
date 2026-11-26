@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Plus, Search, Pencil, Power } from 'lucide-vue-next';
@@ -23,6 +24,7 @@ const props = defineProps<{
     filtros: { buscar: string };
 }>();
 
+const { can } = usePermissions();
 const buscar = ref(props.filtros.buscar || '');
 const modal = ref(false);
 const editando = ref<number | null>(null);
@@ -101,7 +103,7 @@ function cambiarPagina(numero: number) {
                     <h1>Administrar Marcas</h1>
                 </div>
 
-                <button class="btn-nuevo" @click="nuevo">
+                <button class="btn-nuevo" v-if="can('Catálogos.crear')" @click="nuevo">
                     <Plus :size="17" />
                     Nuevo
                 </button>
@@ -149,11 +151,11 @@ function cambiarPagina(numero: number) {
 
                                 <td>
                                     <div class="acciones">
-                                        <button class="btn-editar" @click="editar(marca)" title="Editar">
+                                        <button class="btn-editar" v-if="can('Catálogos.editar')" @click="editar(marca)" title="Editar">
                                             <Pencil :size="16" />
                                         </button>
 
-                                        <button class="btn-estado" @click="cambiarEstado(marca)" title="Cambiar estado">
+                                        <button class="btn-estado" v-if="can('Catálogos.editar')" @click="cambiarEstado(marca)" title="Cambiar estado">
                                             <Power :size="16" />
                                         </button>
                                     </div>

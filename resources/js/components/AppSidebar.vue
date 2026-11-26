@@ -1,6 +1,7 @@
 
 <script setup lang="ts">
 import NavUser from '@/components/NavUser.vue';
+import { usePermissions } from '@/composables/usePermissions';
 import {
     Sidebar,
     SidebarContent,
@@ -34,6 +35,20 @@ import {
 } from 'lucide-vue-next';
 
 const page = usePage();
+const { can } = usePermissions();
+const routePermissions: Record<string,string> = {
+ '/catalogos/grupos':'Catálogos.listar', '/catalogos/marcas':'Catálogos.listar',
+ '/catalogos/unidades':'Unidad.listar', '/catalogos/productos':'Producto.listar',
+ '/compras/proveedores':'Proveedor.listar', '/compras/ordenes':'Compra.listar',
+ '/compras/pagos':'Proveedor.pagos', '/ventas/cajas':'Caja.listar',
+ '/ventas/pedidos':'Venta.listar', '/ventas/cocina':'Cocina.listar',
+ '/ventas/listado':'Venta.listar', '/ventas/clientes':'Clientes.listar',
+ '/reportes/ventas':'Reportes.listar', '/reportes/mensual':'Reportes.listar',
+ '/reportes/compras':'Reportes.listar', '/reportes/stock':'Reportes.listar',
+ '/reportes/cajas':'Reportes.listar', '/ajustes/usuarios':'Usuarios.listar',
+ '/ajustes/roles':'Roles.listar',
+};
+
 
 const rutaActual = computed(() => page.url.split('?')[0]);
 
@@ -83,16 +98,21 @@ const secciones = [
         titulo: 'AJUSTES',
         icono: Settings,
         items: [
-            { titulo: 'Empresa', ruta: '/ajustes/empresa', icono: Store },
-            { titulo: 'Sucursales', ruta: '/ajustes/sucursales', icono: House },
             { titulo: 'Usuarios', ruta: '/ajustes/usuarios', icono: Users },
-            { titulo: 'Roles y Permisos', ruta: '/ajustes/roles', icono: Settings },
+            { titulo: 'Roles', ruta: '/ajustes/roles', icono: Settings },
         ],
     },
 ];
 
+const seccionesVisibles = computed(() =>
+    secciones.map(s => ({
+        ...s,
+        items: s.items.filter(item => can(routePermissions[item.ruta] || '')),
+    })).filter(s => s.items.length > 0),
+);
+
 const abiertos = ref<string[]>(
-    secciones
+    seccionesVisibles.value
         .filter((seccion) =>
             seccion.items.some((item) => rutaActual.value.startsWith(item.ruta)),
         )
@@ -112,7 +132,7 @@ function alternar(titulo: string) {
     <Sidebar collapsible="icon" variant="inset" class="sidebar-snack">
         <SidebarHeader class="cabecera">
             <Link href="/dashboard" class="marca">
-                <div class="logo">S</div>
+                <img class="logo" src="/logo-sistema-vector.svg" alt="Logo SistemaSnack" />
                 <div class="nombre-marca">
                     <strong>SistemaSnack</strong>
                     <span>Sistema de ventas</span>
@@ -124,6 +144,7 @@ function alternar(titulo: string) {
             <div class="titulo-menu">MENÚ PRINCIPAL</div>
 
             <Link
+                v-if="can('Dashboard.ver')"
                 href="/dashboard"
                 class="enlace-principal"
                 :class="{ seleccionado: rutaActual === '/dashboard' }"
@@ -132,7 +153,7 @@ function alternar(titulo: string) {
                 <span>INICIO</span>
             </Link>
 
-            <div v-for="seccion in secciones" :key="seccion.titulo" class="seccion">
+            <div v-for="seccion in seccionesVisibles" :key="seccion.titulo" class="seccion">
                 <button
                     type="button"
                     class="boton-seccion"
@@ -198,16 +219,9 @@ function alternar(titulo: string) {
 }
 
 .logo {
-    width: 39px;
-    height: 39px;
-    border-radius: 50%;
-    color: white;
-    background: #2e9c62;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
-    font-weight: 800;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
     flex-shrink: 0;
 }
 

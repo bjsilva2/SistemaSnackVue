@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logo SistemaSnack">
+<defs>
+<linearGradient id="azul" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071a7d"/><stop offset=".45" stop-color="#1668dc"/><stop offset=".85" stop-color="#061a74"/></linearGradient>
+<linearGradient id="verde" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#36d41f"/><stop offset=".45" stop-color="#09aa15"/><stop offset="1" stop-color="#078b12"/></linearGradient>
+</defs>
+<path d="M 217 33 A 117 117 0 1 0 246 164" fill="none" stroke="#092045" stroke-width="8" stroke-linecap="round" opacity=".9"/>
+<path d="M 217 33 A 117 117 0 1 0 246 164" fill="none" stroke="url(#azul)" stroke-width="5.2" stroke-linecap="round"/>
+<path d="M 214 80 A 92 92 0 1 0 218 168" fill="none" stroke="#14311c" stroke-width="31" stroke-linecap="butt"/>
+<path d="M 214 80 A 92 92 0 1 0 218 168" fill="none" stroke="url(#verde)" stroke-width="24" stroke-linecap="butt"/>
+<path d="M 113 57 H 144 V 112 H 200 V 144 H 144 V 200 H 113 V 144 H 57 V 112 H 113 Z" fill="#122d19" stroke="#102e1a" stroke-width="3" stroke-linejoin="round"/>
+<path d="M 119 65 H 139 V 118 H 193 V 138 H 139 V 192 H 119 V 138 H 65 V 118 H 119 Z" fill="url(#verde)"/>
+</svg>
