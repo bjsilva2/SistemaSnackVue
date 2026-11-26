@@ -29,7 +29,7 @@ function submit() {
         <div class="login-shell">
             <aside class="brand-panel">
                 <div class="brand-identity">
-                    <img src="/logo-sistema.svg" alt="Logotipo original de SistemaSnack" class="brand-logo" />
+                    <img src="/logo-sistema-vector.svg" alt="Logotipo original de SistemaSnack" class="brand-logo" />
                     <h1>Sistema<span>Snack</span></h1>
                     <p>Sistema de ventas</p>
                 </div>
@@ -40,7 +40,7 @@ function submit() {
             <section class="form-panel">
                 <div class="form-inner">
                     <div class="mobile-brand">
-                        <img src="/logo-sistema.svg" alt="" />
+                        <img src="/logo-sistema-vector.svg" alt="" />
                         <span>SistemaSnack</span>
                     </div>
                     <div class="form-heading">
