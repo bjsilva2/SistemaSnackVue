@@ -28,28 +28,7 @@ function submit() {
     <main class="login-page">
         <div class="login-shell">
             <aside class="brand-panel">
-                <div class="brand-top">
-                    <img src="/logo-sistema.svg" alt="Logotipo de SistemaSnack" class="brand-logo" />
-                    <div>
-                        <strong>SistemaSnack</strong>
-                        <span>Sistema de ventas</span>
-                    </div>
-                </div>
-
-                <div class="brand-content">
-                    <span class="brand-eyebrow">PLATAFORMA DE GESTIÓN</span>
-                    <h1>Control de tu negocio en un solo lugar.</h1>
-                    <p>Administra productos, compras, pedidos, ventas, cajas y reportes de manera organizada.</p>
-                    <div class="brand-line"></div>
-                    <div class="brand-assurance">
-                        <ShieldCheck :size="21" aria-hidden="true" />
-                        <span>Acceso seguro para usuarios autorizados</span>
-                    </div>
-                </div>
-
-                <span class="brand-footer">SistemaSnack · Gestión comercial</span>
-                <div class="brand-circle circle-one" aria-hidden="true"></div>
-                <div class="brand-circle circle-two" aria-hidden="true"></div>
+                <img src="/logo-sistema.svg" alt="Logo de SistemaSnack" class="brand-logo-large" />
             </aside>
 
             <section class="form-panel">
@@ -135,23 +114,8 @@ function submit() {
 <style scoped>
 .login-page{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#edf3f7;padding:28px;color:#25384e;font-family:inherit}
 .login-shell{width:min(1080px,100%);min-height:630px;display:grid;grid-template-columns:1.02fr 1fr;overflow:hidden;border-radius:18px;background:white;box-shadow:0 20px 60px rgba(8,40,60,.13)}
-.brand-panel{position:relative;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(150deg,#07354a 4%,#07516a 56%,#087d7e 100%);color:white;padding:40px 42px;isolation:isolate;overflow:hidden}
-.brand-panel>*:not(.brand-circle){position:relative;z-index:1}
-.brand-top{display:flex;align-items:center;gap:13px}
-.brand-logo{height:64px;width:64px;object-fit:contain;background:#fff;border-radius:16px;padding:5px;box-shadow:0 4px 14px #031e303d}
-.brand-top strong{display:block;font-size:24px;font-weight:800;letter-spacing:-.5px}
-.brand-top span{display:block;font-size:13px;color:#d3e5ee;margin-top:2px}
-.brand-content{padding:28px 0 35px;max-width:420px}
-.brand-eyebrow{display:inline-block;background:#ffffff1e;border:1px solid #ffffff45;color:#bdf4d7;font-weight:800;border-radius:999px;padding:7px 12px;font-size:10px;letter-spacing:1.2px}
-.brand-content h1{font-size:clamp(29px,3vw,43px);font-weight:800;line-height:1.17;margin:22px 0 16px;letter-spacing:-1px}
-.brand-content>p{font-size:15px;color:#d8e8ee;line-height:1.8}
-.brand-line{height:3px;width:64px;background:#44dca5;border-radius:10px;margin-top:28px}
-.brand-assurance{display:flex;align-items:center;gap:9px;margin-top:22px;color:#deedea;font-size:12px}
-.brand-assurance svg{color:#89ebca;flex-shrink:0}
-.brand-footer{font-size:11px;color:#bdd9df}
-.brand-circle{position:absolute;border-radius:50%;border:1px solid #ffffff25;z-index:0;pointer-events:none}
-.circle-one{height:440px;width:440px;bottom:-270px;right:-190px;background:#ffffff08}
-.circle-two{height:280px;width:280px;top:-170px;right:-145px;background:#ffffff08}
+.brand-panel{display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#07354a 4%,#07516a 56%,#087d7e 100%);padding:45px;min-width:0}
+.brand-logo-large{display:block;width:min(350px,88%);height:auto;max-height:390px;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(0,0,0,.14))}
 .form-panel{display:flex;align-items:center;justify-content:center;padding:45px 45px 40px;background:#fff}
 .form-inner{max-width:388px;width:100%}
 .mobile-brand{display:none}
